@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import React from 'react';
 import { useState, useEffect } from 'react';
+import { Roboto } from 'next/font/google'
 
 
 type TipoBolsa = 'convenio' | 'sac' | 'merito' | 'cadunico' | 'bancocarioca';
@@ -16,6 +17,12 @@ interface CampoFormulario {
   obrigatorio?: boolean;
   placeholder?: string;
 }
+
+const roboto = Roboto({
+  weight: '700',
+  subsets: ['vietnamese'],
+  display: 'swap',
+})
 
 
 const opcoesAnoEscolar = [
@@ -553,13 +560,29 @@ const camposFormulario: CampoFormulario[][] = [
 
 
 export default function HomePage() {
-
-
   const searchParams = useSearchParams();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const escola = (searchParams.get('escola') as Escola) || 'cel';
-  const tipoPBE = (searchParams.get('tipoPBE') as TipoBolsa) || 'convenio';
+  const escola = searchParams.get('escola') as Escola | null;
+  const tipoPBE = searchParams.get('tipoPBE') as TipoBolsa | null;
+
+  const combinacoesPermitidas: { [key in Escola]: TipoBolsa[] } = {
+    franco: ['convenio', 'sac'],
+    cel: ['convenio', 'sac', 'merito', 'cadunico', 'bancocarioca'],
+  };
+
+  
+  if (!escola || !tipoPBE || !combinacoesPermitidas[escola]?.includes(tipoPBE)) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <h1 className="text-4xl font-bold">ERROR 404</h1>
+        <p className="text-lg font-semibold text-gray-800">
+          Parâmetros obrigatórios incorretos ou ausentes. Por favor, contate o administrador.
+        </p>
+      </div>
+    );
+  }
+
+
 
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [currentStep, setCurrentStep] = useState(0);
@@ -673,7 +696,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gray-100">
-      <div className="w-full max-w-lg p-6 bg-white rounded-lg shadow-md">
+      <div className="w-full p-6 bg-white rounded-lg shadow-lg">
         <h1 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Formulário</h1>
         {formSubmitted ? (
           <div className="text-center">
@@ -688,7 +711,7 @@ export default function HomePage() {
                 </label>
                 {campo.tipoInput === 'dropdown' ? (
                   <select
-                    className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg shadow-black/15`}
                     value={formData[campo.nome] || ''}
                     onChange={(e) => handleChange(campo.nome, e.target.value)}
                   >
@@ -703,7 +726,7 @@ export default function HomePage() {
                   className='text-sm font-medium text-gray-700 mb-1'>
                   <input
                     type={campo.tipoInput || 'text'}
-                    className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm sm:text-sm`}
+                    className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg shadow-black/15`}
                     value={formData[campo.nome] || ''}
                     onChange={(e) => handleChange(campo.nome, e.target.value)}
                     placeholder={campo.placeholder || ''}
