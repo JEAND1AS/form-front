@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 
 type TipoBolsa = 'convenio' | 'sac' | 'merito' | 'cadunico' | 'bancocarioca';
@@ -14,6 +14,7 @@ interface CampoFormulario {
   tipoInput?: 'text' | 'number' | 'date' | 'dropdown';
   opcoesDropdown?: string[];
   obrigatorio?: boolean;
+  placeholder?: string;
 }
 
 
@@ -63,7 +64,8 @@ const camposFormulario: CampoFormulario[][] = [
         bancocarioca: true
       },
       tipoInput: 'text',
-      obrigatorio: true
+      obrigatorio: true,
+      placeholder: 'Nome completo'
     },
 
     {
@@ -337,9 +339,9 @@ const camposFormulario: CampoFormulario[][] = [
       },
       tipoInput: 'dropdown',
       opcoesDropdown: [
-        '1 salários mínimos',
-        '2 - salários mínimos',
-        '3 ou mais salários mínimos'],
+        '1- salário mínimo',
+        '2- salários mínimos',
+        '3- ou mais salários mínimos'],
       obrigatorio: true
     },
 
@@ -584,8 +586,29 @@ export default function HomePage() {
     return regex.test(cpf);
   };
 
+  const formatarTelefone = (valor: string) => {
+    return valor
+      .replace(/\D/g, '')
+      .replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+  };
+  
+  const validarNome = (nome: string) => /^[A-Za-zÀ-ÿ\s]+$/.test(nome);
+  
+  
+  useEffect(() => {
+    const dadosSalvos = localStorage.getItem('formData');
+    if (dadosSalvos) {
+      setFormData(JSON.parse(dadosSalvos));
+    }
+  }, []);
+  
+  useEffect(() => {
+    localStorage.setItem('formData', JSON.stringify(formData));
+  }, [formData]);
+  
   const handleChange = (campo: string, valor: string) => {
-    setFormData(prev => ({ ...prev, [campo]: valor }));
+    const valorFormatado = campo.includes('Telefone') ? formatarTelefone(valor) : valor;
+    setFormData(prev => ({ ...prev, [campo]: valorFormatado }));
     setErrors(prev => ({ ...prev, [campo]: '' }));
   };
 
@@ -620,6 +643,10 @@ export default function HomePage() {
           newErrors[campo.nome] = 'O CPF deve estar no formato 000.000.000-00.';
         }
       }
+
+      if (campo.nome.includes('Nome completo') && valor && !validarNome(valor)) {
+        newErrors[campo.nome] = 'O nome deve conter apenas letras e espaços.';
+      }
     });
 
     setErrors(newErrors);
@@ -631,7 +658,9 @@ export default function HomePage() {
       if (currentStep < camposFormulario.length - 1) {
         setCurrentStep(prev => prev + 1);
       } else {
-        setFormSubmitted(true);
+        console.log('Dados do formulário:', formData); // Exibe os dados no console
+        setFormSubmitted(true); // Marca o formulário como enviado
+        localStorage.removeItem('formData');
       }
     }
   };
@@ -643,42 +672,45 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gray-50">
-      <div className="w-full max-w-2xl p-8 rounded-2xl shadow-lg">
-        <h1 className="text-3xl font-bold mb-6 text-center">
-          Formulário
-        </h1>
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gray-100">
+      <div className="w-full max-w-lg p-6 bg-white rounded-lg shadow-md">
+        <h1 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Formulário</h1>
         {formSubmitted ? (
           <div className="text-center">
-            <p className="text-green-600 font-semibold">Formulário enviado com sucesso!</p>
+            <p className="text-green-600 font-medium">Formulário enviado com sucesso!</p>
           </div>
         ) : (
           <form>
             {camposVisiveis.map((campo, index) => (
               <div key={index} className="mb-4">
-                <label className="block mb-1 font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   {campo.nome} {campo.obrigatorio && <span className="text-red-500">*</span>}
                 </label>
                 {campo.tipoInput === 'dropdown' ? (
                   <select
-                    className={`w-full border ${errors[campo.nome] ? 'border-red-500' : 'border-gray-300'} rounded-lg px-4 py-2`}
+                    className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                     value={formData[campo.nome] || ''}
                     onChange={(e) => handleChange(campo.nome, e.target.value)}
                   >
-                    <option value="" disabled>Selecione uma opção</option>
+                    <option value="" disabled>{campo.placeholder || 'Selecione uma opção'}</option>
                     {campo.opcoesDropdown?.map((opcao, idx) => (
                       <option key={idx} value={opcao}>{opcao}</option>
                     ))}
                   </select>
                 ) : (
+
+                  <span
+                  className='text-sm font-medium text-gray-700 mb-1'>
                   <input
                     type={campo.tipoInput || 'text'}
-                    className={`w-full border ${errors[campo.nome] ? 'border-red-500' : 'border-gray-300'} rounded-lg px-4 py-2`}
+                    className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm sm:text-sm`}
                     value={formData[campo.nome] || ''}
                     onChange={(e) => handleChange(campo.nome, e.target.value)}
+                    placeholder={campo.placeholder || ''}
                   />
+                  </span>
                 )}
-                {errors[campo.nome] && <p className="text-red-500 text-sm">{errors[campo.nome]}</p>}
+                {errors[campo.nome] && <p className="text-red-500 text-xs mt-1">{errors[campo.nome]}</p>}
               </div>
             ))}
 
@@ -687,7 +719,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={handlePrevious}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg"
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg"
                 >
                   Anterior
                 </button>
@@ -695,7 +727,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={handleNext}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg"
               >
                 {currentStep < camposFormulario.length - 1 ? 'Próximo' : 'Enviar'}
               </button>
