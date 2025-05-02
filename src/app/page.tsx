@@ -1,3 +1,22 @@
+/* 
+
+Parâmetros de URL:
+
+http://localhost:3000/?escola=cel&tipoPBE=convênio
+http://localhost:3000/?escola=cel&tipoPBE=sac
+http://localhost:3000/?escola=cel&tipoPBE=Mérito
+http://localhost:3000/?escola=cel&tipoPBE=sac
+http://localhost:3000/?escola=cel&tipoPBE=cadunico
+http://localhost:3000/?escola=cel&tipoPBE=bancocarioca
+http://localhost:3000/?escola=franco&tipoPBE=sac
+http://localhost:3000/?escola=franco&tipoPBE=convenio
+
+
+*/
+
+
+
+
 'use client';
 
 import { useSearchParams } from 'next/navigation';
