@@ -18,11 +18,6 @@ interface CampoFormulario {
   placeholder?: string;
 }
 
-const roboto = Roboto({
-  weight: '700',
-  subsets: ['vietnamese'],
-  display: 'swap',
-})
 
 
 const opcoesAnoEscolar = [
@@ -196,7 +191,7 @@ const camposFormulario: CampoFormulario[][] = [
         bancocarioca: true
       },
       tipoInput: 'dropdown',
-      opcoesDropdown: ['Sim', 'Não', 'Já é aluno do CEL/FRANCO'],
+      opcoesDropdown: ['Sim', 'Não'],
       obrigatorio: true
     },
   ],
@@ -571,14 +566,25 @@ export default function HomePage() {
   };
 
   
-  if (!escola || !tipoPBE || !combinacoesPermitidas[escola]?.includes(tipoPBE)) {
+  if (!escola || !tipoPBE || !combinacoesPermitidas[escola]?.includes(tipoPBE)) { 
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold">ERROR 404</h1>
-        <p className="text-lg font-semibold text-gray-800">
-          Parâmetros obrigatórios incorretos ou ausentes. Por favor, contate o administrador.
+      <div className="min-h-screen bg-white-300 flex flex-col justify-center items-center text-center p-6">
+      <div className="bg-white p-10 rounded-2xl shadow-lg shadow-black/15 max-w-md w-full">
+        <h1 className="text-6xl font-bold text-red-500 mb-4">404</h1>
+        <p className="text-2xl font-semibold text-gray-800 mb-2">
+          Página não encontrada!
         </p>
+        <p className="text-md text-gray-600 mb-6">
+          Parece que você se perdeu nos corredores da escola...
+        </p>
+        <p>Contate o administrador</p>
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/3443/3443338.png"
+          alt="Desenho de quadro-negro"
+          className="w-32 h-32 mx-auto mb-6"
+        />
       </div>
+    </div>
     );
   }
 
@@ -609,10 +615,18 @@ export default function HomePage() {
     return regex.test(cpf);
   };
 
+  const formatarCPF = (valor: string) => {
+    return valor
+      .replace(/\D/g, '') // Remove caracteres não numéricos
+      .replace(/(\d{3})(\d)/, '$1.$2') // Adiciona o primeiro ponto
+      .replace(/(\d{3})(\d)/, '$1.$2') // Adiciona o segundo ponto
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Adiciona o hífen
+  };
+
   const formatarTelefone = (valor: string) => {
     return valor
-      .replace(/\D/g, '')
-      .replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+      .replace(/\D/g, '') // Remove caracteres não numéricos
+      .replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3'); // Formata como (XX) XXXXX-XXXX
   };
   
   const validarNome = (nome: string) => /^[A-Za-zÀ-ÿ\s]+$/.test(nome);
@@ -630,7 +644,14 @@ export default function HomePage() {
   }, [formData]);
   
   const handleChange = (campo: string, valor: string) => {
-    const valorFormatado = campo.includes('Telefone') ? formatarTelefone(valor) : valor;
+    let valorFormatado = valor;
+
+    if (campo.includes('Telefone')) {
+      valorFormatado = formatarTelefone(valor);
+    } else if (campo.includes('CPF')) {
+      valorFormatado = formatarCPF(valor);
+    }
+
     setFormData(prev => ({ ...prev, [campo]: valorFormatado }));
     setErrors(prev => ({ ...prev, [campo]: '' }));
   };
@@ -649,8 +670,8 @@ export default function HomePage() {
       // Validação de idade
       if (campo.nome === 'Data de nascimento:' && valor) {
         const idade = calcularIdade(valor);
-        if (idade < 1 || idade > 18) {
-          newErrors[campo.nome] = 'A idade deve estar entre 3 e 20 anos.';
+        if (idade < 1 || idade > 20) {
+          newErrors[campo.nome] = 'A idade deve estar entre 1 e 20 anos.';
         }
       }
 
@@ -676,6 +697,30 @@ export default function HomePage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const copiarDadosResponsavel1 = () => {
+    const camposResponsavel1 = [
+      'Endereço do responsável 1',
+      'Bairro do responsável 1',
+      'CEP do responsável 1',
+    ];
+  
+    const camposResponsavel2 = [
+      'Endereço do responsável 2',
+      'Bairro do responsável 2',
+      'CEP do responsável 2',
+    ];
+  
+    const novosDados = { ...formData };
+  
+    camposResponsavel1.forEach((campo, index) => {
+      if (formData[campo]) {
+        novosDados[camposResponsavel2[index]] = formData[campo];
+      }
+    });
+  
+    setFormData(novosDados);
+  };
+
   const handleNext = () => {
     if (validateFields()) {
       if (currentStep < camposFormulario.length - 1) {
@@ -694,10 +739,11 @@ export default function HomePage() {
     }
   };
 
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gray-100">
       <div className="w-full p-6 bg-white rounded-lg shadow-lg">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Formulário</h1>
+        <h1 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Formulário - Etapa {currentStep + 1}</h1>
         {formSubmitted ? (
           <div className="text-center">
             <p className="text-green-600 font-medium">Formulário enviado com sucesso!</p>
@@ -736,6 +782,18 @@ export default function HomePage() {
                 {errors[campo.nome] && <p className="text-red-500 text-xs mt-1">{errors[campo.nome]}</p>}
               </div>
             ))}
+
+            {currentStep === 2 && (
+              <div className="mb-4">
+                <button
+                  type="button"
+                  onClick={copiarDadosResponsavel1}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg"
+                >
+                  Reutilizar dados do responsável 1
+                </button>
+              </div>
+            )}
 
             <div className="flex justify-between mt-6">
               {currentStep > 0 && (

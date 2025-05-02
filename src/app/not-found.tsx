@@ -1,12 +1,22 @@
+import React from 'react';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const NotFound = () => {
+export default function NotFound() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-4xl font-bold">ERROR 404</h1>
-      <p className="mt-4 text-lg">A página que está tentando acessar não existe.</p>
+    <div className="min-h-screen bg-white-300 flex flex-col justify-center items-center text-center p-6">
+      <div className="bg-white p-10 rounded-2xl shadow-lg shadow-black/15 max-w-md w-full">
+        <h1 className="text-6xl font-bold text-red-500 mb-4">404</h1>
+        <p className="text-2xl font-semibold text-gray-800 mb-2">
+          Página não encontrada!
+        </p>
+        <p className="text-md text-gray-600 mb-6">
+          Parece que você se perdeu nos corredores da escola...
+        </p>
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/3443/3443338.png"
+          alt="Desenho de quadro-negro"
+          className="w-32 h-32 mx-auto mb-6"
+        />
+      </div>
     </div>
   );
-};
-
-export default NotFound;
+}
