@@ -17,12 +17,13 @@ http://localhost:3000/?escola=franco&tipoPBE=convenio
 
 
 
+
 'use client';
 
 import { useSearchParams } from 'next/navigation';
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Roboto } from 'next/font/google'
+
 
 
 type TipoBolsa = 'convenio' | 'sac' | 'merito' | 'cadunico' | 'bancocarioca';
@@ -572,6 +573,55 @@ const camposFormulario: CampoFormulario[][] = [
   ],
 ];
 
+export const mapearCampos = (dados: { [key: string]: string }) => {
+  return {
+    anoDeInteresse: dados['Ano de interesse:'],
+    nomeEstudante: dados['Nome completo do(a) estudante:'],
+    dataNascimento: dados['Data de nascimento:'],
+    naturalidade: dados['Naturalidade do(a) estudante:'],
+    nis: dados['NIS:'],
+    matricula: dados['Matrícula:'],
+    anoEscolarDeInteresse: dados['Ano escolar de interesse:'],
+    endereco: dados['Endereço:'],
+    bairro: dados['Bairro:'],
+    cep: dados['CEP:'],
+    unidade: dados['Unidade:'],
+    estaMatriculado: dados['Está matriculado no CEL Intercultural School/Colégio Franco em 2023?'],
+
+    nomeResponsavel1: dados['Nome completo do responsável 1'],
+    profissaoResponsavel1: dados['Profissão responsável 1'],
+    cpfResponsavel1: dados['CPF do responsável 1'],
+    rendaResponsavel1: dados['Renda presumida em n° de Salários Mínimos - Responsável 1'],
+    enderecoResponsavel1: dados['Endereço do responsável 1'],
+    bairroResponsavel1: dados['Bairro do responsável 1'],
+    cepResponsavel1: dados['CEP do responsável 1'],
+    telefoneResponsavel1: dados['Telefone do responsável 1'],
+
+    nomeResponsavel2: dados['Nome completo do responsável 2'],
+    profissaoResponsavel2: dados['Profissão responsável 2'],
+    cpfResponsavel2: dados['CPF do responsável 2'],
+    rendaResponsavel2: dados['Renda presumida em n° de Salários Mínimos - Responsável 2'],
+    enderecoResponsavel2: dados['Endereço do responsável 2'],
+    bairroResponsavel2: dados['Bairro do responsável 2'],
+    cepResponsavel2: dados['CEP do responsável 2'],
+    telefoneResponsavel2: dados['Telefone do responsável 2'],
+
+    enderecoFinanceiro: dados['Endereço do responsável financeiro'],
+    bairroFinanceiro: dados['Bairro do responsável financeiro'],
+    cepFinanceiro: dados['CEP do responsável financeiro'],
+    telefoneFinanceiro: dados['Telefone do responsável financeiro'],
+
+    alunoResideCom: dados['Aluno reside com'],
+    orfao: dados['Se orfão, indicar:'],
+    jaSolicitouBolsa: dados['Já solicitou bolsa de estudos?'],
+    anoSolicitacaoBolsa: dados['Se sim, em que ano?'],
+    percentualBolsa: dados['Se sim, qual percentual da bolsa?'],
+    irmaosAlunos: dados['Irmãos que sejam alunos da escola (Nome completo/Série):'],
+    despesasFamilia: dados['Relacione as despesas da família:'],
+    motivoBolsa: dados['Por que a família está solicitando a bolsa de estudos?'],
+    observacoes: dados['Observações Gerais'],
+  };
+};
 
 export default function HomePage() {
   const searchParams = useSearchParams();
@@ -636,16 +686,17 @@ export default function HomePage() {
 
   const formatarCPF = (valor: string) => {
     return valor
-      .replace(/\D/g, '') // Remove caracteres não numéricos
-      .replace(/(\d{3})(\d)/, '$1.$2') // Adiciona o primeiro ponto
-      .replace(/(\d{3})(\d)/, '$1.$2') // Adiciona o segundo ponto
-      .replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Adiciona o hífen
+      .replace(/\D/g, '')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+
   };
 
   const formatarTelefone = (valor: string) => {
     return valor
-      .replace(/\D/g, '') // Remove caracteres não numéricos
-      .replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3'); // Formata como (XX) XXXXX-XXXX
+      .replace(/\D/g, '')
+      .replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3'); 
   };
   
   const validarNome = (nome: string) => /^[A-Za-zÀ-ÿ\s]+$/.test(nome);
@@ -681,12 +732,12 @@ export default function HomePage() {
     camposVisiveis.forEach(campo => {
       const valor = formData[campo.nome]?.toString().trim();
 
-      // Validação de campos obrigatórios
+ 
       if (campo.obrigatorio && !valor) {
         newErrors[campo.nome] = 'Este campo é obrigatório.';
       }
 
-      // Validação de idade
+  
       if (campo.nome === 'Data de nascimento:' && valor) {
         const idade = calcularIdade(valor);
         if (idade < 1 || idade > 20) {
@@ -694,7 +745,7 @@ export default function HomePage() {
         }
       }
 
-      // Validação de CPF
+     
       if (campo.nome === 'CPF do responsável 1' && valor) {
         if (!validarCPF(valor)) {
           newErrors[campo.nome] = 'O CPF deve estar no formato 000.000.000-00.';
@@ -745,8 +796,8 @@ export default function HomePage() {
       if (currentStep < camposFormulario.length - 1) {
         setCurrentStep(prev => prev + 1);
       } else {
-        console.log('Dados do formulário:', formData); // Exibe os dados no console
-        setFormSubmitted(true); // Marca o formulário como enviado
+        console.log('Dados do formulário:', formData); 
+        setFormSubmitted(true);
         localStorage.removeItem('formData');
       }
     }
