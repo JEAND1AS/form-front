@@ -124,3 +124,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+.input-small {
+  width: 50%; /* Ajuste para o tamanho desejado */
+}
