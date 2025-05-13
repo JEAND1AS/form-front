@@ -24,6 +24,7 @@ import { useState, useEffect } from 'react';
 
 
 
+
 type TipoBolsa = 'convenio' | 'sac' | 'merito' | 'cadunico' | 'bancocarioca';
 type Escola = 'cel' | 'franco';
 
@@ -58,6 +59,16 @@ const opcoesAnoEscolar = [
   '2ª série do Ensino Médio',
   '3ª série do Ensino Médio',
 ];
+
+const filiais = [
+
+  { name: 'Maria Angélica - Jardim Botânico', code: 'MA' },
+  { name: 'Lopes Quintas - Jardim Botânico', code: 'LQ' },
+  { name: 'Barra da Tijuca', code: 'BA' },
+  { name: 'Norte Shopping', code: 'NS' },
+  { name: 'Liceu Franco-Brasileiro', code: 'FB' }
+  
+]
 
 const camposFormulario: CampoFormulario[][] = [
 
@@ -681,7 +692,7 @@ const camposFormulario: CampoFormulario[][] = [
     },
 
     {
-      nome: 'Renda presumida em n° de Salários Mínimos - Responsável financeiro', tipos: {
+      nome: 'Renda presumida em n° de Salários Mínimos - Responsável financeiro:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -920,9 +931,12 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: false
     },
   ],
+
+  
 ];
 
-export const mapearCampos = (dados: { [key: string]: string }, tipoPBE: TipoBolsa) => {
+export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: TipoBolsa, escola: Escola) => {
+  const CD_Coligada = escola === 'cel' ? 1 : 5;
   const filiacao2Preenchido = [
     'Nome completo do responsável 2',
     'Profissão responsável 2',
@@ -939,7 +953,13 @@ export const mapearCampos = (dados: { [key: string]: string }, tipoPBE: TipoBols
     'Telefone do responsável 2',
   ].some(campo => dados[campo]?.trim());
 
-  return {
+  
+
+  
+
+
+  const corpo = {
+
     estudante: {
       CD_Ano_Interesse: dados['Ano de interesse:'],
 
@@ -951,9 +971,11 @@ export const mapearCampos = (dados: { [key: string]: string }, tipoPBE: TipoBols
 
       TX_Tipo_PBE: tipoPBE || '',
 
-      CD_NIS: dados['NIS:'],
+      CD_NIS: dados['NIS:'] || null,
 
-      CD_Matricula: dados['Matrícula:'],
+      CD_Matricula: dados['Matrícula:'] || null,
+
+      CD_Coligada,
 
       CD_Ano_Escolar: dados['Ano escolar de interesse:'],
 
@@ -965,7 +987,7 @@ export const mapearCampos = (dados: { [key: string]: string }, tipoPBE: TipoBols
 
       SG_Estado: dados['Estado'],
 
-      TX_Complemento: dados['Complemento:'],
+      TX_Complemento: dados['Complemento:'] || null,
 
       NR_Endereco: dados['Número:'],
 
@@ -974,9 +996,12 @@ export const mapearCampos = (dados: { [key: string]: string }, tipoPBE: TipoBols
       NM_Unidade: dados['Unidade:'],
 
       IN_Aluno: dados['Está matriculado no CEL Intercultural School/Colégio Franco em 2023?'],
+
+      TX_Endereco: `${dados['Logradouro:'] || ''}, ${dados['Número:'] || ''}${dados['Complemento:'] ? ' - complemento: ' + dados['Complemento:'] : ''}, ${dados['Bairro:'] || ''}, ${dados['Cidade'] || ''}, ${dados['Estado'] || ''} - ${dados['CEP:'] || ''}`.trim(),
     },
     filiacao1: {
-      TX_Tipo_Responsavel: 'RESPONSAVEL FINANCEIRO',
+      TX_Tipo_Responsavel: 'FILIACAO1',
+
       NM_Responsavel: dados['Nome - Responsável 1'],
 
       NM_Profissao: dados['Profissão - Responsável 1'],
@@ -998,14 +1023,15 @@ export const mapearCampos = (dados: { [key: string]: string }, tipoPBE: TipoBols
 
       SG_Estado: dados['Estado - Responsável 1:'],
 
+
       NR_Telefone: dados['Telefone - Responsável 1'],
 
-      Tx_Email: dados['E-mail - responsável 1:'],
+      TX_Email: dados['E-mail - responsável 1:'],
     },
 
     filiacao2: filiacao2Preenchido
       ? {
-        TX_Tipo_Responsavel: 'RESPONSAVEL FINANCEIRO',
+        TX_Tipo_Responsavel: 'FILIACAO2',
 
         NM_Responsavel: dados['Nome completo - Responsável 2:'],
         
@@ -1018,7 +1044,7 @@ export const mapearCampos = (dados: { [key: string]: string }, tipoPBE: TipoBols
 
         TX_Logradouro: dados['Logradouro - Responsável 2:'],
 
-        NR_Endereco: dados['Número endereço - Responsável 2:'],
+        NR_Endereco: dados['Número - Responsável 2:'],
 
         TX_Complemento: dados['Complemento - Responsável 2:'],
 
@@ -1032,11 +1058,11 @@ export const mapearCampos = (dados: { [key: string]: string }, tipoPBE: TipoBols
 
         NR_Telefone: dados['Telefone - responsável 2'],
 
-        Tx_Email: dados['E-mail - responsável 2:'],
+        TX_Email: dados['E-mail - responsável 2:'],
         }
       : null,
 
-    responsaveFinanceiro: {
+    responsavelFinanceiro: {
       TX_Tipo_Responsavel: 'RESPONSAVEL FINANCEIRO',
       NM_Responsavel: dados['Nome completo - Responsável financeiro:'],
 
@@ -1044,15 +1070,15 @@ export const mapearCampos = (dados: { [key: string]: string }, tipoPBE: TipoBols
 
       CD_CPF: dados['CPF - Responsável financeiro:'],
 
-      TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável 1'],
+      TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável financeiro:'],
 
       TX_Logradouro: dados['Logradouro - Responsável financeiro:'],
 
-      NR_Endereco: dados['Número - Responsável 1:'],
+      NR_Endereco: dados['Número - Responsável financeiro:'],
 
-      TX_Complemento: dados['Complemento - Responsável 1:'],
+      TX_Complemento: dados['Complemento - Responsável financeiro:'],
 
-      CD_CEP: dados['CEP - Responsável 1:'],
+      CD_CEP: dados['CEP - Responsável financeiro:'],
 
       NM_Bairro: dados['Bairro - Responsável financeiro:'],
 
@@ -1062,9 +1088,31 @@ export const mapearCampos = (dados: { [key: string]: string }, tipoPBE: TipoBols
 
       NR_Telefone: dados['Telefone - Responsável financeiro:'],
 
-      Tx_Email: dados['E-mail - Responsável financeiro:'],
+      TX_Email: dados['E-mail - Responsável financeiro:'],
     },
+
+    informacoesAdicionais: {
+    TX_Aluno_Reside_Com: dados['Aluno reside com'],
+
+    IN_Orfao: dados['Se orfão, indicar:'],
+  
+    IN_Solicitou_Bolsa_Antes: dados['Já solicitou bolsa de estudos?'],
+  
+    CD_Bolsa_Ano: dados['Se sim, em que ano?'],
+  
+    TX_Bolsa_Percentual: dados['Se sim, qual percentual da bolsa?'],
+  
+    IN_Irmaos_Alunos: dados['Irmãos que sejam alunos da escola (Nome completo/Série):'],
+  
+    TX_Relacao_Despesas: dados['Relacione as despesas da família:'],
+  
+    TX_Motivo_Bolsa: dados['Por que a família está solicitando a bolsa de estudos?'],
+  
+    TX_Observacoes_Gerais: dados['Observações Gerais'],
+    }
   };
+
+  return corpo;
 };
 
 export default function HomePage() {
@@ -1180,7 +1228,7 @@ export default function HomePage() {
         const { logradouro, bairro, localidade, uf } = await response.json();
   
         const prefixos: Record<string, string> = {
-          'CEP:': '',
+          'CEP:': 'estudante',
           'CEP - Responsável 1:': 'Responsável 1:',
           'CEP - Responsável 2:': 'Responsável 2:',
           'CEP - Responsável financeiro:': 'Responsável financeiro:',
@@ -1320,17 +1368,36 @@ export default function HomePage() {
     setFormData(novosDados);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (validateFields()) {
       if (currentStep < camposFormulario.length - 1) {
         setCurrentStep(prev => prev + 1);
       } else {
-        console.log('Dados do formulário:', formData); 
-        setFormSubmitted(true);
-        localStorage.removeItem('formData');
+        try {
+          const dadosParaEnvio = await mapearCampos(formData, tipoPBE!, escola!);
+          const res = await fetch('http://localhost:3001/pbe/criar', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dadosParaEnvio),
+          });
+  
+          if (!res.ok) {
+            throw new Error('Erro ao enviar o formulário');
+          }
+  
+          console.log('Formulário enviado com sucesso!');
+          setFormSubmitted(true);
+          localStorage.removeItem('formData');
+        } catch (error) {
+          console.error('Erro no envio:', error);
+          alert('Erro ao enviar formulário. Tente novamente.');
+        }
       }
     }
   };
+  
 
   const handlePrevious = () => {
     if (currentStep > 0) {
