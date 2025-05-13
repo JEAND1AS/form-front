@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/rules-of-hooks */
 /* 
 
 Parâmetros de URL:
@@ -16,14 +18,11 @@ http://localhost:3000/?escola=franco&tipoPBE=convenio
 
 
 
-'use client';
+"use client";
 
 import { useSearchParams } from 'next/navigation';
 import React from 'react';
 import { useState, useEffect } from 'react';
-
-
-
 
 type TipoBolsa = 'convenio' | 'sac' | 'merito' | 'cadunico' | 'bancocarioca';
 type Escola = 'cel' | 'franco';
@@ -36,8 +35,6 @@ interface CampoFormulario {
   obrigatorio?: boolean;
   placeholder?: string;
 }
-
-
 
 const opcoesAnoEscolar = [
   'Berçário I (Bebês a partir de 3 meses de idade)',
@@ -61,19 +58,15 @@ const opcoesAnoEscolar = [
 ];
 
 const filiais = [
-
   { name: 'Maria Angélica - Jardim Botânico', code: 'MA' },
   { name: 'Lopes Quintas - Jardim Botânico', code: 'LQ' },
   { name: 'Barra da Tijuca', code: 'BA' },
   { name: 'Norte Shopping', code: 'NS' },
   { name: 'Liceu Franco-Brasileiro', code: 'FB' }
-  
-]
+];
 
 const camposFormulario: CampoFormulario[][] = [
-
   [
-
     {
       nome: 'Ano de interesse:', tipos: {
         convenio: true,
@@ -86,7 +79,6 @@ const camposFormulario: CampoFormulario[][] = [
       opcoesDropdown: ['2024', '2025', '2026'],
       obrigatorio: true
     },
-
     {
       nome: 'Está matriculado no CEL Intercultural School/Colégio Franco em 2023?', tipos: {
         convenio: true,
@@ -99,7 +91,6 @@ const camposFormulario: CampoFormulario[][] = [
       opcoesDropdown: ['Sim', 'Não'],
       obrigatorio: true
     },
-
     {
       nome: 'Matrícula:', tipos: {
         convenio: true,
@@ -111,7 +102,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'number',
       obrigatorio: true
     },
-
     {
       nome: 'Nome completo do(a) estudante:', tipos: {
         convenio: true,
@@ -124,7 +114,6 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true,
       placeholder: 'Nome completo'
     },
-
     {
       nome: 'Data de nascimento:', tipos: {
         convenio: true,
@@ -137,8 +126,6 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true,
       placeholder: 'DD/MM/AAAA'
     },
-
-
     {
       nome: 'Ano escolar de interesse:', tipos: {
         convenio: true,
@@ -151,7 +138,6 @@ const camposFormulario: CampoFormulario[][] = [
       opcoesDropdown: opcoesAnoEscolar,
       obrigatorio: true
     },
-
     {
       nome: 'Naturalidade do(a) estudante:', tipos: {
         convenio: true,
@@ -163,7 +149,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
     {
       nome: 'NIS:', tipos: {
         convenio: false,
@@ -175,7 +160,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'number',
       obrigatorio: true
     },
-
     {
       nome: 'CEP:', tipos: {
         convenio: true,
@@ -188,7 +172,6 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true,
       placeholder: '_____-___'
     },
-
     {
       nome: 'Endereço:', tipos: {
         convenio: true,
@@ -200,8 +183,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-    
-
     {
       nome: 'Logradouro:', tipos: {
         convenio: true,
@@ -213,7 +194,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
     {
       nome: 'Bairro:', tipos: {
         convenio: true,
@@ -225,7 +205,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
     {
       nome: 'Cidade:', tipos: {
         convenio: true,
@@ -237,7 +216,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
     {
       nome: 'Estado:', tipos: {
         convenio: true,
@@ -250,7 +228,6 @@ const camposFormulario: CampoFormulario[][] = [
       opcoesDropdown: ['RJ', 'SP', 'MG', 'ES', 'RS', 'SC', 'PR', 'BA', 'PE', 'CE', 'MA', 'PI', 'AL', 'SE', 'PB', 'RN', 'TO', 'GO', 'DF'],
       obrigatorio: true
     },
-
     {
       nome: 'Número:', tipos: {
         convenio: true,
@@ -262,7 +239,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'number',
       obrigatorio: false
     },
-
     {
       nome: 'Telefone:', tipos: {
         convenio: true,
@@ -274,7 +250,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
     {
       nome: 'Complemento:', tipos: {
         convenio: true,
@@ -286,10 +261,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-
-
-    
-
     {
       nome: 'Unidade:', tipos: {
         convenio: true,
@@ -302,9 +273,8 @@ const camposFormulario: CampoFormulario[][] = [
       opcoesDropdown: ['Maria Angélica - Jardim Botânico', 'Lopes Quintas   - Jardim Botânico', 'Barra da Tijuca', 'Norte Shopping'],
       obrigatorio: true
     },
-
-    
   ],
+
 
   [
     {
@@ -317,7 +287,6 @@ const camposFormulario: CampoFormulario[][] = [
       },
       obrigatorio: true
     },
-
     {
       nome: 'Profissão - Responsável 1', tipos: {
         convenio: true,
@@ -328,8 +297,6 @@ const camposFormulario: CampoFormulario[][] = [
       },
       obrigatorio: true
     },
-
-
     {
       nome: 'CPF - Responsável 1', tipos: {
         convenio: true,
@@ -341,7 +308,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
     {
       nome: 'Renda presumida em n° de Salários Mínimos - Responsável 1', tipos: {
         convenio: true,
@@ -357,7 +323,6 @@ const camposFormulario: CampoFormulario[][] = [
         '3ouMaisSM'],
       obrigatorio: true
     },
-
     {
       nome: 'CEP - Responsável 1:', tipos: {
         convenio: true,
@@ -370,7 +335,6 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true,
       placeholder: '_____-___'
     },
-
     {
       nome: 'Estado - Responsável 1:', tipos: {
         convenio: true,
@@ -384,6 +348,17 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true
     },
 
+    {
+      nome: 'Endereço - Responsável 1:', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'text',
+      obrigatorio: true
+    },
 
     {
       nome: 'Logradouro - Responsável 1:', tipos: {
@@ -396,8 +371,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-    
-
     {
       nome: 'Bairro - Responsável 1:', tipos: {
         convenio: true,
@@ -409,8 +382,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
-
     {
       nome: 'Cidade - Responsável 1:', tipos: {
         convenio: true,
@@ -422,7 +393,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
     {
       nome: 'Número - Responsável 1:', tipos: {
         convenio: true,
@@ -434,7 +404,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'number',
       obrigatorio: true
     },
-
     {
       nome: 'Complemento - Responsável 1:', tipos: {
         convenio: true,
@@ -446,9 +415,8 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-
     {
-      nome: 'Telefone - Responsável 1', tipos: {
+      nome: 'Telefone - Responsável 1:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -458,9 +426,8 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
     {
-      nome: 'E-mail - responsável 1:', tipos: {
+      nome: 'E-mail - Responsável 1:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -470,7 +437,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
     {
       nome: 'Mora com o responsável 2:?', tipos: {
         convenio: true,
@@ -483,7 +449,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'dropdown',
       opcoesDropdown: ['Sim', 'Não'],
     },
-
     {
       nome: 'Nome completo - Responsável 2:', tipos: {
         convenio: true,
@@ -494,7 +459,6 @@ const camposFormulario: CampoFormulario[][] = [
       },
       obrigatorio: false
     },
-
     {
       nome: 'Profissão - Responsável 2:', tipos: {
         convenio: true,
@@ -505,8 +469,6 @@ const camposFormulario: CampoFormulario[][] = [
       },
       obrigatorio: false
     },
-
-
     {
       nome: 'CPF - Responsável 2:', tipos: {
         convenio: true,
@@ -515,10 +477,9 @@ const camposFormulario: CampoFormulario[][] = [
         cadunico: true,
         bancocarioca: true
       },
-      tipoInput: 'number',
+      tipoInput: 'text',
       obrigatorio: false
     },
-
     {
       nome: 'Renda presumida em n° de Salários Mínimos - Responsável 2:', tipos: {
         convenio: true,
@@ -534,8 +495,6 @@ const camposFormulario: CampoFormulario[][] = [
         '3ouMaisSM'],
       obrigatorio: false
     },
-
-
     {
       nome: 'CEP - Responsável 2:', tipos: {
         convenio: true,
@@ -544,11 +503,10 @@ const camposFormulario: CampoFormulario[][] = [
         cadunico: true,
         bancocarioca: true
       },
-      tipoInput: 'number',
+      tipoInput: 'text',
       obrigatorio: false,
       placeholder: '_____-___'
     },
-
     {
       nome: 'Estado - Responsável 2:', tipos: {
         convenio: true,
@@ -562,6 +520,17 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: false
     },
 
+    {
+      nome: 'Endereço - Responsável 2:', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'text',
+      obrigatorio: false
+    },
 
     {
       nome: 'Logradouro - Responsável 2:', tipos: {
@@ -574,7 +543,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-
     {
       nome: 'Bairro - Responsável 2:', tipos: {
         convenio: true,
@@ -586,8 +554,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-
-
     {
       nome: 'Cidade - Responsável 2:', tipos: {
         convenio: true,
@@ -599,7 +565,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-
     {
       nome: 'Complemento - Responsável 2:', tipos: {
         convenio: true,
@@ -611,7 +576,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-
     {
       nome: 'Número - Responsável 2:', tipos: {
         convenio: true,
@@ -625,13 +589,14 @@ const camposFormulario: CampoFormulario[][] = [
     },
 
     {
-      nome: 'Telefone - Responsável 2', tipos: {
+      nome: 'Telefone - Responsável 2:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
         cadunico: true,
         bancocarioca: true
       },
+      tipoInput: 'text',
       obrigatorio: false
     },
 
@@ -646,13 +611,8 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-
-    
   ],
-
   [
-
-
     {
       nome: 'Nome completo - Responsável financeiro:', tipos: {
         convenio: true,
@@ -664,10 +624,6 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true,
       placeholder: 'Nome completo'
     },
-
-    
-    
-
     {
       nome: 'Profissão - Responsável financeiro:', tipos: {
         convenio: true,
@@ -678,7 +634,6 @@ const camposFormulario: CampoFormulario[][] = [
       },
       obrigatorio: true
     },
-
     {
       nome: 'CPF - Responsável financeiro:', tipos: {
         convenio: true,
@@ -690,7 +645,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
     {
       nome: 'Renda presumida em n° de Salários Mínimos - Responsável financeiro:', tipos: {
         convenio: true,
@@ -706,7 +660,6 @@ const camposFormulario: CampoFormulario[][] = [
         '2SM',
         '3ouMaisSM'],
     },
-
     {
       nome: 'CEP - Responsável financeiro:', tipos: {
         convenio: true,
@@ -718,7 +671,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
     {
       nome: 'Estado - Responsável financeiro:', tipos: {
         convenio: true,
@@ -731,10 +683,20 @@ const camposFormulario: CampoFormulario[][] = [
       opcoesDropdown: ['RJ', 'SP', 'MG', 'ES', 'RS', 'SC', 'PR', 'BA', 'PE', 'CE', 'MA', 'PI', 'AL', 'SE', 'PB', 'RN', 'TO', 'GO', 'DF'],
       obrigatorio: true
     },
-
-
     {
       nome: 'Logradouro - Responsável financeiro:', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'text',
+      obrigatorio: true
+    },
+
+    {
+      nome: 'Endereço - Responsável financeiro:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -756,8 +718,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-
-
     {
       nome: 'Cidade - Responsável financeiro:', tipos: {
         convenio: true,
@@ -769,7 +729,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-   
     {
       nome: 'Número - Responsável financeiro:', tipos: {
         convenio: true,
@@ -781,7 +740,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'number',
       obrigatorio: true
     },
-
     {
       nome: 'Complemento - Responsável financeiro:', tipos: {
         convenio: true,
@@ -793,7 +751,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: true
     },
-
     {
       nome: 'Telefone - Responsável financeiro', tipos: {
         convenio: true,
@@ -804,8 +761,7 @@ const camposFormulario: CampoFormulario[][] = [
       },
       tipoInput: 'text',
       obrigatorio: true
-    }, 
-
+    },
     {
       nome: 'E-mail - Responsável financeiro:', tipos: {
         convenio: true,
@@ -817,7 +773,6 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true
     },
   ],
-
   [
     {
       nome: 'Aluno reside com', tipos: {
@@ -834,7 +789,6 @@ const camposFormulario: CampoFormulario[][] = [
         'Ambos'],
       obrigatorio: true
     },
-
     {
       nome: 'Se orfão, indicar:', tipos: {
         convenio: false,
@@ -849,7 +803,6 @@ const camposFormulario: CampoFormulario[][] = [
         'Não'],
       obrigatorio: true
     },
-
     {
       nome: 'Já solicitou bolsa de estudos?', tipos: {
         convenio: false,
@@ -863,7 +816,6 @@ const camposFormulario: CampoFormulario[][] = [
         'Não'],
       obrigatorio: true
     },
-
     {
       nome: 'Se sim, em que ano?', tipos: {
         convenio: false,
@@ -874,7 +826,6 @@ const camposFormulario: CampoFormulario[][] = [
       },
       obrigatorio: false
     },
-
     {
       nome: 'Se sim, qual percentual da bolsa?', tipos: {
         convenio: false,
@@ -885,7 +836,6 @@ const camposFormulario: CampoFormulario[][] = [
       },
       obrigatorio: false
     },
-
     {
       nome: 'Irmãos que sejam alunos da escola (Nome completo/Série):', tipos: {
         convenio: false,
@@ -897,8 +847,19 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true
     },
 
+  {
+    nome: 'Mora com quem?:', tipos: {
+      convenio: false,
+      sac: true,
+      merito: false,
+      cadunico: true,
+      bancocarioca: true
+    },
+    tipoInput: 'text',
+    obrigatorio: true
+  },
+
     {
-      
       nome: 'Relacione as despesas da família:', tipos: {
         convenio: false,
         sac: true,
@@ -908,7 +869,6 @@ const camposFormulario: CampoFormulario[][] = [
       },
       obrigatorio: true
     },
-
     {
       nome: 'Por que a família está solicitando a bolsa de estudos?', tipos: {
         convenio: false,
@@ -919,7 +879,6 @@ const camposFormulario: CampoFormulario[][] = [
       },
       obrigatorio: false
     },
-
     {
       nome: 'Observações Gerais', tipos: {
         convenio: false,
@@ -931,16 +890,14 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: false
     },
   ],
-
-  
 ];
 
 export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: TipoBolsa, escola: Escola) => {
   const CD_Coligada = escola === 'cel' ? 1 : 5;
   const filiacao2Preenchido = [
-    'Nome completo do responsável 2',
-    'Profissão responsável 2',
-    'CPF do responsável 2',
+    'Nome completo - Responsável 2',
+    'Profissão - Responsável 2',
+    'CPF - Responsável 2',
     'Renda presumida em n° de Salários Mínimos - Responsável 2',
     'Endereço - Responsável 2:',
     'Logradouro - Responsável 2:',
@@ -950,165 +907,97 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
     'Bairro - Responsável 2:',
     'Cidade - Responsável 2:',
     'Estado - Responsável 2:',
-    'Telefone do responsável 2',
+    'Telefone - Responsável 2:',
   ].some(campo => dados[campo]?.trim());
 
-  
-
-  
-
-
   const corpo = {
-
     estudante: {
-      CD_Ano_Interesse: dados['Ano de interesse:'],
-
-      NM_Aluno: dados['Nome completo do(a) estudante:'],
-
-      DT_Nascimento: dados['Data de nascimento:'],
-      
-      NM_Naturalidade: dados['Naturalidade do(a) estudante:'],
-
+      CD_Ano_Interesse: dados['Ano de interesse:'] || '',
+      NM_Aluno: dados['Nome completo do(a) estudante:'] || '',
+      DT_Nascimento: dados['Data de nascimento:'] || '',
+      NM_Naturalidade: dados['Naturalidade do(a) estudante:'] || '',
       TX_Tipo_PBE: tipoPBE || '',
-
       CD_NIS: dados['NIS:'] || null,
-
       CD_Matricula: dados['Matrícula:'] || null,
-
       CD_Coligada,
-
-      CD_Ano_Escolar: dados['Ano escolar de interesse:'],
-
-      TX_Logradouro: dados['Logradouro:'],
-
-      NM_Bairro: dados['Bairro:'],
-
-      NM_Cidade: dados['Cidade'],
-
-      SG_Estado: dados['Estado'],
-
+      CD_Ano_Escolar: dados['Ano escolar de interesse:'] || '',
+      TX_Logradouro: dados['Logradouro:'] || '',
+      NM_Bairro: dados['Bairro:'] || '',
+      NM_Cidade: dados['Cidade:'] || '',
+      SG_Estado: dados['Estado:'] || '',
       TX_Complemento: dados['Complemento:'] || null,
-
-      NR_Endereco: dados['Número:'],
-
-      CD_CEP: dados['CEP:'],
-
-      NM_Unidade: dados['Unidade:'],
-
-      IN_Aluno: dados['Está matriculado no CEL Intercultural School/Colégio Franco em 2023?'],
-
-      TX_Endereco: `${dados['Logradouro:'] || ''}, ${dados['Número:'] || ''}${dados['Complemento:'] ? ' - complemento: ' + dados['Complemento:'] : ''}, ${dados['Bairro:'] || ''}, ${dados['Cidade'] || ''}, ${dados['Estado'] || ''} - ${dados['CEP:'] || ''}`.trim(),
+      NR_Endereco: dados['Número:'] || '',
+      CD_CEP: dados['CEP:'] || '',
+      NM_Unidade: dados['Unidade:'] || '',
+      IN_Aluno: dados['Está matriculado no CEL Intercultural School/Colégio Franco em 2023?'] || '',
+      TX_Endereco: `${dados['Endereço:'] || ''}, ${dados['Número:'] || ''}${dados['Complemento:'] ? ' - complemento: ' + dados['Complemento:'] : ''}, ${dados['Bairro:'] || ''}, ${dados['Cidade'] || ''}, ${dados['Estado'] || ''} - ${dados['CEP:'] || ''}`.trim(),
     },
     filiacao1: {
       TX_Tipo_Responsavel: 'FILIACAO1',
-
-      NM_Responsavel: dados['Nome - Responsável 1'],
-
-      NM_Profissao: dados['Profissão - Responsável 1'],
-      CD_CPF: dados['CPF - Responsável 1'],
-
-      TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável 1'],
-
-      TX_Logradouro: dados['Logradouro - Responsável 1:'],
-
-      NR_Endereco: dados['Número - Responsável 1:'],
-
-      TX_Complemento: dados['Complemento - Responsável 1:'],
-
-      CD_CEP: dados['CEP - Responsável 1:'],
-
-      NM_Bairro: dados['Bairro - Responsável 1:'],
-
-      NM_Cidade: dados['Cidade - Responsável 1:'],
-
-      SG_Estado: dados['Estado - Responsável 1:'],
-
-
-      NR_Telefone: dados['Telefone - Responsável 1'],
-
-      TX_Email: dados['E-mail - responsável 1:'],
+      NM_Responsavel: dados['Nome - Responsável 1'] || '',
+      NM_Profissao: dados['Profissão - Responsável 1'] || '',
+      CD_CPF: dados['CPF - Responsável 1'] || '',
+      TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável 1'] || '',
+      TX_Logradouro: dados['Endereço - Responsável 1:'] || '',
+      TX_Endereco: `${dados['Logradouro - Responsável 1:'] || ''}, ${dados['Número - Responsável 1:'] || ''}${dados['Complemento - Responsável 1:'] ? ' - complemento: ' + dados['Complemento - Responsável 1:'] : ''}, ${dados['Bairro - Responsável 1:'] || ''}, ${dados['Cidade - Responsável 1:'] || ''}, ${dados['Estado - Responsável 1:'] || ''} - ${dados['CEP - Responsável 1:'] || ''}`.trim(),
+      NR_Endereco: dados['Número - Responsável 1:'] || '',
+      TX_Complemento: dados['Complemento - Responsável 1:'] || '',
+      CD_CEP: dados['CEP - Responsável 1:'] || '',
+      NM_Bairro: dados['Bairro - Responsável 1:'] || '',
+      NM_Cidade: dados['Cidade - Responsável 1:'] || '',
+      SG_Estado: dados['Estado - Responsável 1:'] || '',
+      NR_Telefone: dados['Telefone - Responsável 1:'] || '',
+      TX_Email: dados['E-mail - Responsável 1:'] || '',
     },
 
     filiacao2: filiacao2Preenchido
       ? {
         TX_Tipo_Responsavel: 'FILIACAO2',
-
-        NM_Responsavel: dados['Nome completo - Responsável 2:'],
-        
-        NM_Profissao: dados['Profissão - Responsável 2:'],
-
-        CD_CPF: dados['CPF - Responsável 2:'],
-
-        TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável 2:'],
-
-
-        TX_Logradouro: dados['Logradouro - Responsável 2:'],
-
-        NR_Endereco: dados['Número - Responsável 2:'],
-
-        TX_Complemento: dados['Complemento - Responsável 2:'],
-
-        CD_CEP: dados['CEP - Responsável 2:'],
-
-        NM_Bairro: dados['Bairro - Responsável 2:'],
-
-        NM_Cidade: dados['Cidade - Responsável 2:'],
-
-        SG_Estado: dados['Estado - Responsável 2:'],
-
-        NR_Telefone: dados['Telefone - responsável 2'],
-
-        TX_Email: dados['E-mail - responsável 2:'],
+        NM_Responsavel: dados['Nome completo - Responsável 2:'] || '',
+        NM_Profissao: dados['Profissão - Responsável 2:'] || '',
+        CD_CPF: dados['CPF - Responsável 2:'] || '',
+        TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável 2:'] || '',
+        TX_Endereco: `${dados['Endereço - Responsável 2:'] || ''}, ${dados['Número - Responsável 2:'] || ''}${dados['Complemento - Responsável 2:'] ? ' - complemento: ' + dados['Complemento - Responsável 2:'] : ''}, ${dados['Bairro - Responsável 2:'] || ''}, ${dados['Cidade - Responsável 2:'] || ''}, ${dados['Estado - Responsável 2:'] || ''} - ${dados['CEP - Responsável 2:'] || ''}`.trim(),
+        TX_Logradouro: dados['Logradouro - Responsável 2:'] || '',
+        NR_Endereco: dados['Número - Responsável 2:'] || '',
+        TX_Complemento: dados['Complemento - Responsável 2:'] || '',
+        CD_CEP: dados['CEP - Responsável 2:'] || '',
+        NM_Bairro: dados['Bairro - Responsável 2:'] || '',
+        NM_Cidade: dados['Cidade - Responsável 2:'] || '',
+        SG_Estado: dados['Estado - Responsável 2:'] || '',
+        NR_Telefone: dados['Telefone - Responsável 2:'] || '',
+        TX_Email: dados['E-mail - Responsável 2:'] || '',
         }
       : null,
-
     responsavelFinanceiro: {
       TX_Tipo_Responsavel: 'RESPONSAVEL FINANCEIRO',
-      NM_Responsavel: dados['Nome completo - Responsável financeiro:'],
-
-      NM_Profissao: dados['Profissão - Responsável financeiro:'],
-
-      CD_CPF: dados['CPF - Responsável financeiro:'],
-
-      TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável financeiro:'],
-
-      TX_Logradouro: dados['Logradouro - Responsável financeiro:'],
-
-      NR_Endereco: dados['Número - Responsável financeiro:'],
-
-      TX_Complemento: dados['Complemento - Responsável financeiro:'],
-
-      CD_CEP: dados['CEP - Responsável financeiro:'],
-
-      NM_Bairro: dados['Bairro - Responsável financeiro:'],
-
-      NM_Cidade: dados['Cidade - Responsável financeiro:'],
-
-      SG_Estado: dados['Estado - Responsável financeiro:'],
-
-      NR_Telefone: dados['Telefone - Responsável financeiro:'],
-
-      TX_Email: dados['E-mail - Responsável financeiro:'],
+      NM_Responsavel: dados['Nome completo - Responsável financeiro:'] || '',
+      NM_Profissao: dados['Profissão - Responsável financeiro:'] || '',
+      CD_CPF: dados['CPF - Responsável financeiro:'] || '',
+      TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável financeiro:'] || '',
+      TX_Endereco: `${dados['Endereço - Responsável financeiro:'] || ''}, ${dados['Número - Responsável financeiro:'] || ''}${dados['Complemento - Responsável financeiro:'] ? ' - complemento: ' + dados['Complemento - Responsável financeiro:'] : ''}, ${dados['Bairro - Responsável financeiro:'] || ''}, ${dados['Cidade - Responsável financeiro:'] || ''}, ${dados['Estado - Responsável financeiro:'] || ''} - ${dados['CEP - Responsável financeiro:'] || ''}`.trim(),
+      TX_Logradouro: dados['Logradouro - Responsável financeiro:'] || '',
+      NR_Endereco: dados['Número - Responsável financeiro:'] || '',
+      TX_Complemento: dados['Complemento - Responsável financeiro:'] || '',
+      CD_CEP: dados['CEP - Responsável financeiro:'] || '',
+      NM_Bairro: dados['Bairro - Responsável financeiro:'] || '',
+      NM_Cidade: dados['Cidade - Responsável financeiro:'] || '',
+      SG_Estado: dados['Estado - Responsável financeiro:'] || '',
+      NR_Telefone: dados['Telefone - Responsável financeiro:'] || '',
+      TX_Email: dados['E-mail - Responsável financeiro:'] || '',
     },
 
     informacoesAdicionais: {
-    TX_Aluno_Reside_Com: dados['Aluno reside com'],
-
-    IN_Orfao: dados['Se orfão, indicar:'],
-  
-    IN_Solicitou_Bolsa_Antes: dados['Já solicitou bolsa de estudos?'],
-  
-    CD_Bolsa_Ano: dados['Se sim, em que ano?'],
-  
-    TX_Bolsa_Percentual: dados['Se sim, qual percentual da bolsa?'],
-  
-    IN_Irmaos_Alunos: dados['Irmãos que sejam alunos da escola (Nome completo/Série):'],
-  
-    TX_Relacao_Despesas: dados['Relacione as despesas da família:'],
-  
-    TX_Motivo_Bolsa: dados['Por que a família está solicitando a bolsa de estudos?'],
-  
-    TX_Observacoes_Gerais: dados['Observações Gerais'],
+      TX_Aluno_Reside_Com: dados['Aluno reside com'] || '',
+      IN_Orfao: dados['Se orfão, indicar:'] || null,
+      IN_Solicitou_Bolsa_Antes: dados['Já solicitou bolsa de estudos?'] || '',
+      CD_Bolsa_Ano: dados['Se sim, em que ano?'] || '',
+      TX_Bolsa_Percentual: dados['Se sim, qual percentual da bolsa?'] || '',
+      IN_Irmaos_Alunos: dados['Irmãos que sejam alunos da escola (Nome completo/Série):'] || '',
+      TX_Relacao_Residentes: dados['Mora com quem?:'] || '',
+      TX_Relacao_Despesas: dados['Relacione as despesas da família:'],
+      TX_Motivo_Bolsa: dados['Por que a família está solicitando a bolsa de estudos?'] || '',
+      TX_Observacoes_Gerais: dados['Observações Gerais'] || '',
     }
   };
 
@@ -1126,7 +1015,6 @@ export default function HomePage() {
     cel: ['convenio', 'sac', 'merito', 'cadunico', 'bancocarioca'],
   };
 
-  
   if (!escola || !tipoPBE || !combinacoesPermitidas[escola]?.includes(tipoPBE)) { 
     return (
       <div className="min-h-screen bg-white-300 flex flex-col justify-center items-center text-center p-6">
@@ -1149,8 +1037,6 @@ export default function HomePage() {
     );
   }
 
-
-
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [currentStep, setCurrentStep] = useState(0);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -1161,7 +1047,7 @@ export default function HomePage() {
       campo.nome === 'Matrícula:' &&
       formData['Está matriculado no CEL Intercultural School/Colégio Franco em 2023?'] !== 'Sim'
     ) {
-      return false; // Oculta o campo "Matrícula" se a resposta for diferente de "Sim"
+      return false; 
     }
   
     if (
@@ -1170,7 +1056,6 @@ export default function HomePage() {
     ) {
       return false; 
     }
-  
   
     return campo.tipos[tipoPBE];
   });
@@ -1186,7 +1071,7 @@ export default function HomePage() {
     return idade;
   };
 
-  // Função para validar CPF
+
   const validarCPF = (cpf: string) => {
     const regex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
     return regex.test(cpf);
@@ -1209,7 +1094,6 @@ export default function HomePage() {
   
   const validarNome = (nome: string) => /^[A-Za-zÀ-ÿ\s]+$/.test(nome);
   
-  
   useEffect(() => {
     const dadosSalvos = localStorage.getItem('formData');
     if (dadosSalvos) {
@@ -1222,35 +1106,66 @@ export default function HomePage() {
   }, [formData]);
   
   const buscarEndereco = async (cep: string, campo: string) => {
-    if (cep.length === 9) {
-      try {
-        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-        const { logradouro, bairro, localidade, uf } = await response.json();
-  
-        const prefixos: Record<string, string> = {
-          'CEP:': 'estudante',
-          'CEP - Responsável 1:': 'Responsável 1:',
-          'CEP - Responsável 2:': 'Responsável 2:',
-          'CEP - Responsável financeiro:': 'Responsável financeiro:',
-        };
-  
-        const prefixo = prefixos[campo] || '';
-  
-        setFormData(prev => ({
-          ...prev,
-          [`Logradouro - ${prefixo}`.trim()]: logradouro || '',
-          [`Bairro - ${prefixo}`.trim()]: bairro || '',
-          [`Cidade - ${prefixo}`.trim()]: localidade || '',
-          [`Estado - ${prefixo}`.trim()]: uf || '',
-        }));
-      } catch (error) {
-        console.error('Erro ao buscar endereço:', error);
-      }
-    }
-  };
-  
-  
+  if (cep.length === 9) {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep.replace('-', '')}/json/`);
+      if (!response.ok) throw new Error('Erro ao buscar o endereço');
 
+      const { logradouro, bairro, localidade, uf, erro } = await response.json();
+
+      if (erro) {
+        console.error('CEP não encontrado');
+        return;
+      }
+
+      
+      const camposMap: Record<string, { logradouro: string; bairro: string; cidade: string; estado: string }> = {
+        'CEP:': {
+          logradouro: 'Logradouro:',
+          bairro: 'Bairro:',
+          cidade: 'Cidade:',
+          estado: 'Estado:',
+        },
+        'CEP - Responsável 1:': {
+          logradouro: 'Logradouro - Responsável 1:',
+          bairro: 'Bairro - Responsável 1:',
+          cidade: 'Cidade - Responsável 1:',
+          estado: 'Estado - Responsável 1:',
+        },
+        'CEP - Responsável 2:': {
+          logradouro: 'Logradouro - Responsável 2:',
+          bairro: 'Bairro - Responsável 2:',
+          cidade: 'Cidade - Responsável 2:',
+          estado: 'Estado - Responsável 2:',
+        },
+        'CEP - Responsável financeiro:': {
+          logradouro: 'Logradouro - Responsável financeiro:',
+          bairro: 'Bairro - Responsável financeiro:',
+          cidade: 'Cidade - Responsável financeiro:',
+          estado: 'Estado - Responsável financeiro:',
+        },
+      };
+
+      const campos = camposMap[campo];
+      if (!campos) {
+        console.warn('Campo de CEP não mapeado:', campo);
+        return;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        [campos.logradouro]: logradouro || '',
+        [campos.bairro]: bairro || '',
+        [campos.cidade]: localidade || '',
+        [campos.estado]: uf || '',
+      }));
+    } catch (error) {
+      console.error('Erro ao buscar endereço:', error);
+    }
+  }
+};
+
+  
   const handleChange = (campo: string, valor: string) => {
     let valorFormatado = valor;
   
@@ -1270,8 +1185,6 @@ export default function HomePage() {
     setFormData(prev => ({ ...prev, [campo]: valorFormatado }));
     setErrors(prev => ({ ...prev, [campo]: '' }));
   };
-  
-  
 
   const validateFields = () => {
     const newErrors: { [key: string]: string } = {};
@@ -1279,12 +1192,10 @@ export default function HomePage() {
     camposVisiveis.forEach(campo => {
       const valor = formData[campo.nome]?.toString().trim();
 
- 
       if (campo.obrigatorio && !valor) {
         newErrors[campo.nome] = 'Este campo é obrigatório.';
       }
 
-  
       if (campo.nome === 'Data de nascimento:' && valor) {
         const idade = calcularIdade(valor);
         if (idade < 1 || idade > 20) {
@@ -1292,14 +1203,7 @@ export default function HomePage() {
         }
       }
 
-     
-      if (campo.nome === 'CPF do responsável 1' && valor) {
-        if (!validarCPF(valor)) {
-          newErrors[campo.nome] = 'O CPF deve estar no formato 000.000.000-00.';
-        }
-      }
-
-      if (campo.nome === 'CPF do responsável 2' && valor) {
+      if (campo.nome.includes('CPF') && valor) {
         if (!validarCPF(valor)) {
           newErrors[campo.nome] = 'O CPF deve estar no formato 000.000.000-00.';
         }
@@ -1310,30 +1214,7 @@ export default function HomePage() {
       }
     });
 
-    if (formData['Mora com o responsável 2:?'] === 'Sim') {
-      const camposResponsavel2 = [
-        'Nome completo - Responsável 2:',
-        'Profissão - Responsável 2:',
-        'CPF - Responsável 2:',
-        'Renda presumida em n° de Salários Mínimos - Responsável 2:',
-        'Logradouro - Responsável 2:',
-        'Número - Responsável 2:',
-        'Complemento - Responsável 2:',
-        'CEP - Responsável 2:',
-        'Bairro - Responsável 2:',
-        'Cidade - Responsável 2:',
-        'Estado - Responsável 2:',
-        'Telefone - Responsável 2:',
-        'E-mail - Responsável 2:',
-      ];
-
-      camposResponsavel2.forEach(campo => {
-        if (!formData[campo]?.trim()) {
-          newErrors[campo] = 'Este campo é obrigatório ao selecionar SIM.';
-        }
-      });
-    }
-
+    console.log('Erros de validação:', newErrors); 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -1397,14 +1278,12 @@ export default function HomePage() {
       }
     }
   };
-  
 
   const handlePrevious = () => {
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
     }
   };
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-100 p-6">
