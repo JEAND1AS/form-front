@@ -31,7 +31,7 @@ type Escola = 'cel' | 'franco';
 interface CampoFormulario {
   nome: string;
   tipos: { [key in TipoBolsa]: boolean };
-  tipoInput?: 'text' | 'number' | 'date' | 'dropdown';
+  tipoInput?: 'text' | 'number' | 'date' | 'dropdown' | 'email';
   opcoesDropdown?: string[];
   obrigatorio?: boolean;
   placeholder?: string;
@@ -65,6 +65,8 @@ const filiais = [
   { name: 'Norte Shopping', code: 'NS' },
   { name: 'Liceu Franco-Brasileiro', code: 'FB' }
 ];
+
+
 
 const camposFormulario: CampoFormulario[][] = [
   [
