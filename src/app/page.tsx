@@ -4,7 +4,7 @@
 
 Parâmetros de URL:
 
-http://localhost:3000/?escola=cel&tipoPBE=convênio
+http://localhost:3000/?escola=cel&tipoPBE=convenio
 http://localhost:3000/?escola=cel&tipoPBE=sac
 http://localhost:3000/?escola=cel&tipoPBE=Mérito
 http://localhost:3000/?escola=cel&tipoPBE=sac
@@ -24,6 +24,8 @@ import { useSearchParams } from 'next/navigation';
 import React from 'react';
 import { useState, useEffect } from 'react';
 import BarraProgresso from '@/components/ui/BarraProgresso';
+import { Bounce, ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 type TipoBolsa = 'convenio' | 'sac' | 'merito' | 'cadunico' | 'bancocarioca';
 type Escola = 'cel' | 'franco';
@@ -65,6 +67,8 @@ const filiais = [
   { name: 'Norte Shopping', code: 'NS' },
   { name: 'Liceu Franco-Brasileiro', code: 'FB' }
 ];
+
+
 
 
 
@@ -234,14 +238,14 @@ const camposFormulario: CampoFormulario[][] = [
     },
     {
       nome: 'Endereço:', tipos: {
-        convenio: true,
-        sac: true,
-        merito: true,
-        cadunico: true,
-        bancocarioca: true
+        convenio: false,
+        sac: false,
+        merito: false,
+        cadunico: false,
+        bancocarioca: false
       },
       tipoInput: 'text',
-      obrigatorio: true
+      obrigatorio: false
     },
     {
       nome: 'Complemento:', tipos: {
@@ -396,14 +400,14 @@ const camposFormulario: CampoFormulario[][] = [
     },
     {
       nome: 'Endereço - Responsável 1:', tipos: {
-        convenio: true,
-        sac: true,
-        merito: true,
-        cadunico: true,
-        bancocarioca: true
+        convenio: false,
+        sac: false,
+        merito: false,
+        cadunico: false,
+        bancocarioca: false
       },
       tipoInput: 'text',
-      obrigatorio: true
+      obrigatorio: false
     },
     {
       nome: 'Complemento - Responsável 1:', tipos: {
@@ -566,11 +570,11 @@ const camposFormulario: CampoFormulario[][] = [
     },
     {
       nome: 'Endereço - Responsável 2:', tipos: {
-        convenio: true,
-        sac: true,
-        merito: true,
-        cadunico: true,
-        bancocarioca: true
+        convenio: false,
+        sac: false,
+        merito: false,
+        cadunico: false,
+        bancocarioca: false
       },
       tipoInput: 'text',
       obrigatorio: false
@@ -586,7 +590,7 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-    
+
     {
       nome: 'Telefone - Responsável 2:', tipos: {
         convenio: true,
@@ -669,7 +673,8 @@ const camposFormulario: CampoFormulario[][] = [
         bancocarioca: true
       },
       tipoInput: 'text',
-      obrigatorio: true
+      obrigatorio: true,
+      placeholder: '_____-___'
     },
     {
       nome: 'Logradouro - Responsável financeiro:', tipos: {
@@ -729,14 +734,14 @@ const camposFormulario: CampoFormulario[][] = [
     },
     {
       nome: 'Endereço - Responsável financeiro:', tipos: {
-        convenio: true,
-        sac: true,
-        merito: true,
-        cadunico: true,
-        bancocarioca: true
+        convenio: false,
+        sac: false,
+        merito: false,
+        cadunico: false,
+        bancocarioca: false
       },
       tipoInput: 'text',
-      obrigatorio: true
+      obrigatorio: false
     },
     {
       nome: 'Complemento - Responsável financeiro:', tipos: {
@@ -750,7 +755,7 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: false
     },
     {
-      nome: 'Telefone - Responsável financeiro', tipos: {
+      nome: 'Telefone - Responsável financeiro:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -913,7 +918,7 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
       NM_Aluno: dados['Nome completo do(a) estudante:'] || '',
       DT_Nascimento: dados['Data de nascimento:'] || '',
       NM_Naturalidade: dados['Naturalidade do(a) estudante:'] || '',
-      TX_Tipo_PBE: tipoPBE || '',
+      TX_Tipo_PBE: tipoPBE,
       CD_NIS: dados['NIS:'] || null,
       CD_Matricula: dados['Matrícula:'] || null,
       CD_Coligada,
@@ -927,85 +932,95 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
       CD_CEP: dados['CEP:'] || '',
       NM_Unidade: dados['Unidade:'] || '',
       IN_Aluno: dados['Está matriculado no CEL Intercultural School/Colégio Franco em 2023?'] || '',
-      TX_Endereco: `${dados['Endereço:'] || ''}, ${dados['Número:'] || ''}${dados['Complemento:'] ? ' - complemento: ' + dados['Complemento:'] : ''}, ${dados['Bairro:'] || ''}, ${dados['Cidade'] || ''}, ${dados['Estado'] || ''} - ${dados['CEP:'] || ''}`.trim(),
+      TX_Endereco: `${dados['Endereço:'] || ''}${dados['Complemento:'] ? ' - complemento: ' + dados['Complemento:'] : ''}`.trim() || '',
     },
     filiacao1: {
       TX_Tipo_Responsavel: 'FILIACAO1',
-      NM_Responsavel: dados['Nome - Responsável 1'] || '',
-      NM_Profissao: dados['Profissão - Responsável 1'] || '',
-      CD_CPF: dados['CPF - Responsável 1'] || '',
-      TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável 1'] || '',
-      TX_Logradouro: dados['Endereço - Responsável 1:'] || '',
-      TX_Endereco: `${dados['Logradouro - Responsável 1:'] || ''}, ${dados['Número - Responsável 1:'] || ''}${dados['Complemento - Responsável 1:'] ? ' - complemento: ' + dados['Complemento - Responsável 1:'] : ''}, ${dados['Bairro - Responsável 1:'] || ''}, ${dados['Cidade - Responsável 1:'] || ''}, ${dados['Estado - Responsável 1:'] || ''} - ${dados['CEP - Responsável 1:'] || ''}`.trim(),
-      NR_Endereco: dados['Número - Responsável 1:'] || '',
-      TX_Complemento: dados['Complemento - Responsável 1:'] || '',
-      CD_CEP: dados['CEP - Responsável 1:'] || '',
-      NM_Bairro: dados['Bairro - Responsável 1:'] || '',
-      NM_Cidade: dados['Cidade - Responsável 1:'] || '',
-      SG_Estado: dados['Estado - Responsável 1:'] || '',
-      NR_Telefone: dados['Telefone - Responsável 1:'] || '',
-      TX_Email: dados['E-mail - Responsável 1:'] || '',
+      NM_Responsavel: dados['Nome - Responsável 1'],
+      NM_Profissao: dados['Profissão - Responsável 1'],
+      CD_CPF: dados['CPF - Responsável 1'],
+      TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável 1'],
+      TX_Logradouro: dados['Logradouro - Responsável 1:'],
+      TX_Endereco: `${dados['Endereço - Responsável 1:']}${dados['Complemento - Responsável 1:'] ? ' - complemento: ' + dados['Complemento - Responsável 1:'] : ''}`.trim() || null,
+      NR_Endereco: dados['Número - Responsável 1:'] || null,
+      TX_Complemento: dados['Complemento - Responsável 1:'] || null,
+      CD_CEP: dados['CEP - Responsável 1:'],
+      NM_Bairro: dados['Bairro - Responsável 1:'],
+      NM_Cidade: dados['Cidade - Responsável 1:'],
+      SG_Estado: dados['Estado - Responsável 1:'],
+      NR_Telefone: dados['Telefone - Responsável 1:'] || null,
+      TX_Email: dados['E-mail - Responsável 1:'],
     },
 
     filiacao2: filiacao2Preenchido
       ? {
         TX_Tipo_Responsavel: 'FILIACAO2',
-        NM_Responsavel: dados['Nome completo - Responsável 2:'] || '',
-        NM_Profissao: dados['Profissão - Responsável 2:'] || '',
-        CD_CPF: dados['CPF - Responsável 2:'] || '',
-        TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável 2:'] || '',
-        TX_Endereco: `${dados['Endereço - Responsável 2:'] || ''}, ${dados['Número - Responsável 2:'] || ''}${dados['Complemento - Responsável 2:'] ? ' - complemento: ' + dados['Complemento - Responsável 2:'] : ''}, ${dados['Bairro - Responsável 2:'] || ''}, ${dados['Cidade - Responsável 2:'] || ''}, ${dados['Estado - Responsável 2:'] || ''} - ${dados['CEP - Responsável 2:'] || ''}`.trim(),
-        TX_Logradouro: dados['Logradouro - Responsável 2:'] || '',
-        NR_Endereco: dados['Número - Responsável 2:'] || '',
+        NM_Responsavel: dados['Nome completo - Responsável 2:'] || null,
+        NM_Profissao: dados['Profissão - Responsável 2:'] || null,
+        CD_CPF: dados['CPF - Responsável 2:'] || null,
+        TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável 2:'] || null,
+        TX_Endereco: `${dados['Endereço - Responsável 2:'] || ''}${dados['Complemento - Responsável 2:'] ? ' - complemento: ' + dados['Complemento - Responsável 2:'] : ''}`.trim() || null,
+        TX_Logradouro: dados['Logradouro - Responsável 2:'] || null,
+        NR_Endereco: dados['Número - Responsável 2:'] || null,
         TX_Complemento: dados['Complemento - Responsável 2:'] || '',
-        CD_CEP: dados['CEP - Responsável 2:'] || '',
-        NM_Bairro: dados['Bairro - Responsável 2:'] || '',
-        NM_Cidade: dados['Cidade - Responsável 2:'] || '',
-        SG_Estado: dados['Estado - Responsável 2:'] || '',
-        NR_Telefone: dados['Telefone - Responsável 2:'] || '',
-        TX_Email: dados['E-mail - Responsável 2:'] || '',
+        CD_CEP: dados['CEP - Responsável 2:'] || null,
+        NM_Bairro: dados['Bairro - Responsável 2:'] || null,
+        NM_Cidade: dados['Cidade - Responsável 2:'] || null,
+        SG_Estado: dados['Estado - Responsável 2:'] || null,
+        NR_Telefone: dados['Telefone - Responsável 2:'] || null,
+        TX_Email: dados['E-mail - Responsável 2:'] || null,
       }
       : null,
     responsavelFinanceiro: {
       TX_Tipo_Responsavel: 'RESPONSAVEL FINANCEIRO',
-      NM_Responsavel: dados['Nome completo - Responsável financeiro:'] || '',
-      NM_Profissao: dados['Profissão - Responsável financeiro:'] || '',
-      CD_CPF: dados['CPF - Responsável financeiro:'] || '',
-      TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável financeiro:'] || '',
-      TX_Endereco: `${dados['Endereço - Responsável financeiro:'] || ''}, ${dados['Número - Responsável financeiro:'] || ''}${dados['Complemento - Responsável financeiro:'] ? ' - complemento: ' + dados['Complemento - Responsável financeiro:'] : ''}, ${dados['Bairro - Responsável financeiro:'] || ''}, ${dados['Cidade - Responsável financeiro:'] || ''}, ${dados['Estado - Responsável financeiro:'] || ''} - ${dados['CEP - Responsável financeiro:'] || ''}`.trim(),
-      TX_Logradouro: dados['Logradouro - Responsável financeiro:'] || '',
-      NR_Endereco: dados['Número - Responsável financeiro:'] || '',
-      TX_Complemento: dados['Complemento - Responsável financeiro:'] || '',
-      CD_CEP: dados['CEP - Responsável financeiro:'] || '',
-      NM_Bairro: dados['Bairro - Responsável financeiro:'] || '',
-      NM_Cidade: dados['Cidade - Responsável financeiro:'] || '',
-      SG_Estado: dados['Estado - Responsável financeiro:'] || '',
-      NR_Telefone: dados['Telefone - Responsável financeiro:'] || '',
-      TX_Email: dados['E-mail - Responsável financeiro:'] || '',
+      NM_Responsavel: dados['Nome completo - Responsável financeiro:'],
+      NM_Profissao: dados['Profissão - Responsável financeiro:'],
+      CD_CPF: dados['CPF - Responsável financeiro:'],
+      TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável financeiro:'],
+      TX_Endereco: `${dados['Endereço - Responsável financeiro:']}${dados['Complemento - Responsável financeiro:'] ? ' - complemento: ' + dados['Complemento - Responsável financeiro:'] : ''}`.trim() || '',
+      TX_Logradouro: dados['Logradouro - Responsável financeiro:'],
+      NR_Endereco: dados['Número - Responsável financeiro:'],
+      TX_Complemento: dados['Complemento - Responsável financeiro:'] || null,
+      CD_CEP: dados['CEP - Responsável financeiro:'],
+      NM_Bairro: dados['Bairro - Responsável financeiro:'],
+      NM_Cidade: dados['Cidade - Responsável financeiro:'],
+      SG_Estado: dados['Estado - Responsável financeiro:'],
+      NR_Telefone: dados['Telefone - Responsável financeiro:'],
+      TX_Email: dados['E-mail - Responsável financeiro:'],
     },
 
     informacoesAdicionais: {
-      TX_Aluno_Reside_Com: dados['Aluno reside com'] || '',
+      TX_Aluno_Reside_Com: dados['Aluno reside com'] || null,
       IN_Orfao: dados['Se orfão, indicar:'] || null,
       IN_Solicitou_Bolsa_Antes: dados['Já solicitou bolsa de estudos?'] || '',
-      CD_Bolsa_Ano: dados['Se sim, em que ano?'] || '',
-      TX_Bolsa_Percentual: dados['Se sim, qual percentual da bolsa?'] || '',
-      IN_Irmaos_Alunos: dados['Irmãos que sejam alunos da escola (Nome completo/Série):'] || '',
-      TX_Relacao_Residentes: dados['Mora com quem?:'] || '',
-      TX_Relacao_Despesas: dados['Relacione as despesas da família:'],
-      TX_Motivo_Bolsa: dados['Por que a família está solicitando a bolsa de estudos?'] || '',
-      TX_Observacoes_Gerais: dados['Observações Gerais'] || '',
+      CD_Bolsa_Ano: dados['Se sim, em que ano?'] || null,
+      TX_Bolsa_Percentual: dados['Se sim, qual percentual da bolsa?'] || null,
+      IN_Irmaos_Alunos: dados['Irmãos que sejam alunos da escola (Nome completo/Série):'] || null,
+      TX_Relacao_Residentes: dados['Mora com quem?:'] || null,
+      TX_Relacao_Despesas: dados['Relacione as despesas da família:'] || null,
+      TX_Motivo_Bolsa: dados['Por que a família está solicitando a bolsa de estudos?'] || null,
+      TX_Observacoes_Gerais: dados['Observações Gerais'] || null,
     }
   };
 
   return corpo;
 };
 
+function normalizarParametro(param: string | null): string | null {
+  if (!param) return null;
+  return param
+    .normalize('NFD') // separa acentos das letras
+    .replace(/[\u0300-\u036f]/g, '') // remove acentos
+    .toLowerCase()
+    .trim();
+}
+
 export default function HomePage() {
   const searchParams = useSearchParams();
 
-  const escola = searchParams.get('escola') as Escola | null;
-  const tipoPBE = searchParams.get('tipoPBE') as TipoBolsa | null;
+  const escola = normalizarParametro(searchParams.get('escola')) as Escola | null;
+  const tipoPBE = normalizarParametro(searchParams.get('tipoPBE')) as TipoBolsa | null;
+
 
   const combinacoesPermitidas: { [key in Escola]: TipoBolsa[] } = {
     franco: ['convenio', 'sac'],
@@ -1038,6 +1053,9 @@ export default function HomePage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const totalEtapasVisiveis = camposFormulario.filter(etapa =>
+    etapa.some(campo => campo.tipos[tipoPBE])
+  ).length;
 
   const camposVisiveis = camposFormulario[currentStep].filter(campo => {
     if (
@@ -1179,7 +1197,52 @@ export default function HomePage() {
       valorFormatado = formatarCPF(valor);
     }
 
-    setFormData(prev => ({ ...prev, [campo]: valorFormatado }));
+
+    setFormData(prev => {
+      const novoFormData = { ...prev, [campo]: valorFormatado };
+
+
+      if (
+        [
+          'Logradouro:', 'Número:', 'Bairro:', 'Cidade:', 'Estado:', 'CEP:'
+        ].includes(campo)
+      ) {
+        novoFormData['Endereço:'] =
+          `${novoFormData['Logradouro:'] || ''}, ${novoFormData['Número:'] || ''}, ${novoFormData['Bairro:'] || ''}, ${novoFormData['Cidade:'] || ''}, ${novoFormData['Estado:'] || ''} - ${novoFormData['CEP:'] || ''}`.replace(/(, )+/g, ', ').replace(/^, |, $/g, '').replace(/, ,/g, ',');
+      }
+
+
+      if (
+        [
+          'Logradouro - Responsável 1:', 'Número - Responsável 1:', 'Bairro - Responsável 1:', 'Cidade - Responsável 1:', 'Estado - Responsável 1:', 'CEP - Responsável 1:'
+        ].includes(campo)
+      ) {
+        novoFormData['Endereço - Responsável 1:'] =
+          `${novoFormData['Logradouro - Responsável 1:'] || ''}, ${novoFormData['Número - Responsável 1:'] || ''}, ${novoFormData['Bairro - Responsável 1:'] || ''}, ${novoFormData['Cidade - Responsável 1:'] || ''}, ${novoFormData['Estado - Responsável 1:'] || ''} - ${novoFormData['CEP - Responsável 1:'] || ''}`.replace(/(, )+/g, ', ').replace(/^, |, $/g, '').replace(/, ,/g, ',');
+      }
+
+
+      if (
+        [
+          'Logradouro - Responsável 2:', 'Número - Responsável 2:', 'Bairro - Responsável 2:', 'Cidade - Responsável 2:', 'Estado - Responsável 2:', 'CEP - Responsável 2:'
+        ].includes(campo)
+      ) {
+        novoFormData['Endereço - Responsável 2:'] =
+          `${novoFormData['Logradouro - Responsável 2:'] || ''}, ${novoFormData['Número - Responsável 2:'] || ''}, ${novoFormData['Bairro - Responsável 2:'] || ''}, ${novoFormData['Cidade - Responsável 2:'] || ''}, ${novoFormData['Estado - Responsável 2:'] || ''} - ${novoFormData['CEP - Responsável 2:'] || ''}`.replace(/(, )+/g, ', ').replace(/^, |, $/g, '').replace(/, ,/g, ',');
+      }
+
+      if (
+        [
+          'Logradouro - Responsável financeiro:', 'Número - Responsável financeiro:', 'Bairro - Responsável financeiro:', 'Cidade - Responsável financeiro:', 'Estado - Responsável financeiro:', 'CEP - Responsável financeiro:'
+        ].includes(campo)
+      ) {
+        novoFormData['Endereço - Responsável financeiro:'] =
+          `${novoFormData['Logradouro - Responsável financeiro:'] || ''}, ${novoFormData['Número - Responsável financeiro:'] || ''}, ${novoFormData['Bairro - Responsável financeiro:'] || ''}, ${novoFormData['Cidade - Responsável financeiro:'] || ''}, ${novoFormData['Estado - Responsável financeiro:'] || ''} - ${novoFormData['CEP - Responsável financeiro:'] || ''}`.replace(/(, )+/g, ', ').replace(/^, |, $/g, '').replace(/, ,/g, ',');
+      }
+
+      return novoFormData;
+    });
+
     setErrors(prev => ({ ...prev, [campo]: '' }));
   };
 
@@ -1195,7 +1258,7 @@ export default function HomePage() {
 
       if (campo.nome === 'Data de nascimento:' && valor) {
         const idade = calcularIdade(valor);
-        if (idade < 1 || idade > 20) {
+        if (idade < 1) {
           newErrors[campo.nome] = 'A idade deve estar entre 1 e 20 anos.';
         }
       }
@@ -1250,11 +1313,12 @@ export default function HomePage() {
 
   const handleNext = async () => {
     if (validateFields()) {
-      if (currentStep < camposFormulario.length - 1) {
+      if (currentStep < totalEtapasVisiveis - 1) {
         setCurrentStep(prev => prev + 1);
       } else {
         try {
           const dadosParaEnvio = await mapearCampos(formData, tipoPBE!, escola!);
+
           const res = await fetch('http://localhost:3001/pbe/criar', {
             method: 'POST',
             headers: {
@@ -1264,17 +1328,27 @@ export default function HomePage() {
           });
 
           if (!res.ok) {
-            throw new Error('Erro ao enviar o formulário');
+            const erro = await res.json();
+            toast.error(`Erro: ${erro?.message || 'Erro ao enviar o formulário'}`);
+            return; // cancela a execução
           }
 
+          toast.success('Formulário enviado com sucesso!');
           console.log('Formulário enviado com sucesso!');
           setFormSubmitted(true);
           localStorage.removeItem('formData');
-        } catch (error) {
+
+        } catch (error: unknown) {
           console.error('Erro no envio:', error);
-          alert('Erro ao enviar formulário. Tente novamente.');
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : 'Verifique o log de erro';
+          toast.error(`Erro inesperado: ${errorMessage}`);
         }
       }
+    } else {
+      toast.warn('Preencha todos os campos obrigatórios');
     }
   };
 
@@ -1284,8 +1358,15 @@ export default function HomePage() {
     }
   };
 
-
-
+  /*   function montarEndereco(prefixo = '') {
+      const logradouro = formData[`${prefixo}Logradouro${prefixo ? ' -' : ':'}`] || '';
+      const numero = formData[`${prefixo}Número${prefixo ? ' -' : ':'}`] || '';
+      const bairro = formData[`${prefixo}Bairro${prefixo ? ' -' : ':'}`] || '';
+      const cidade = formData[`${prefixo}Cidade${prefixo ? ' -' : ':'}`] || '';
+      const estado = formData[`${prefixo}Estado${prefixo ? ' -' : ':'}`] || '';
+      const cep = formData[`${prefixo}CEP${prefixo ? ' -' : ':'}`] || '';
+      return `${logradouro}, ${numero}, ${bairro}, ${cidade}, ${estado} - ${cep}`.replace(/(, )+/g, ', ').replace(/^, |, $/g, '').replace(/, ,/g, ',');
+    } */
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-100 p-6">
@@ -1326,10 +1407,15 @@ export default function HomePage() {
                     value={formData[campo.nome] || ''}
                     onChange={(e) => handleChange(campo.nome, e.target.value)}
                     placeholder={campo.placeholder || ''}
+                    {...(campo.tipoInput === 'date' ? { max: '2024-12-31' } : {})}
                   />
                 )}
                 {errors[campo.nome] && <p className="text-red-500 text-xs mt-1">{errors[campo.nome]}</p>}
+
+
               </div>
+
+
             ))}
 
             {currentStep === 1 && (
@@ -1359,12 +1445,25 @@ export default function HomePage() {
                 onClick={handleNext}
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200"
               >
-                {currentStep < camposFormulario.length - 1 ? 'Próximo →' : 'Enviar'}
+                {currentStep < totalEtapasVisiveis - 1 ? 'Próximo →' : 'Enviar'}
               </button>
             </div>
           </form>
         )}
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
+      />
     </div>
   );
 }
