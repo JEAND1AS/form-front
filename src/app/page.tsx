@@ -26,6 +26,10 @@ import { useState, useEffect } from 'react';
 import BarraProgresso from '@/components/ui/BarraProgresso';
 import { Bounce, ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { filiais } from '@/lib/filiais';
+
+
+
 
 type TipoBolsa = 'convenio' | 'sac' | 'merito' | 'cadunico' | 'bancocarioca';
 type Escola = 'cel' | 'franco';
@@ -61,22 +65,12 @@ const opcoesAnoEscolar = [
   '3ª série do Ensino Médio',
 ];
 
-const filiais = [
-  { name: 'Maria Angélica - Jardim Botânico', code: 'MA' },
-  { name: 'Lopes Quintas - Jardim Botânico', code: 'LQ' },
-  { name: 'Barra da Tijuca', code: 'BA' },
-  { name: 'Norte Shopping', code: 'NS' },
-  { name: 'Liceu Franco-Brasileiro', code: 'FB' }
-];
-
-
-
 
 
 const camposFormulario: CampoFormulario[][] = [
   [
     {
-      nome: 'Ano de interesse:', tipos: {
+      nome: 'Ano de interesse da matrícula:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -88,7 +82,7 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true
     },
     {
-      nome: 'Está matriculado no CEL Intercultural School/Colégio Franco em 2023?', tipos: {
+      nome: 'Está matriculado no CEL Intercultural School?', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -99,6 +93,20 @@ const camposFormulario: CampoFormulario[][] = [
       opcoesDropdown: ['Sim', 'Não'],
       obrigatorio: true
     },
+
+   /*  {
+      nome: 'Está matriculado no Franco?', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'dropdown',
+      opcoesDropdown: ['Sim', 'Não'],
+      obrigatorio: true
+    }, */
+
     {
       nome: 'Matrícula:', tipos: {
         convenio: true,
@@ -109,6 +117,18 @@ const camposFormulario: CampoFormulario[][] = [
       },
       tipoInput: 'number',
       obrigatorio: true
+    },
+    {
+      nome: 'Ano escolar de interesse do(a) estudante:', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'dropdown',
+      opcoesDropdown: opcoesAnoEscolar,
+      obrigatorio: true,
     },
     {
       nome: 'Nome completo do(a) estudante:', tipos: {
@@ -135,18 +155,6 @@ const camposFormulario: CampoFormulario[][] = [
       placeholder: 'DD/MM/AAAA'
     },
     {
-      nome: 'Ano escolar de interesse:', tipos: {
-        convenio: true,
-        sac: true,
-        merito: true,
-        cadunico: true,
-        bancocarioca: true
-      },
-      tipoInput: 'dropdown',
-      opcoesDropdown: opcoesAnoEscolar,
-      obrigatorio: true
-    },
-    {
       nome: 'Naturalidade do(a) estudante:', tipos: {
         convenio: true,
         sac: true,
@@ -156,6 +164,17 @@ const camposFormulario: CampoFormulario[][] = [
       },
       tipoInput: 'text',
       obrigatorio: true
+    },
+    {
+      nome: 'Unidade:', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'dropdown',
+      obrigatorio: true,
     },
     {
       nome: 'NIS:', tipos: {
@@ -180,7 +199,6 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true,
       placeholder: '_____-___'
     },
-
     {
       nome: 'Logradouro:', tipos: {
         convenio: true,
@@ -259,32 +277,27 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-    {
-      nome: 'Telefone:', tipos: {
-        convenio: true,
-        sac: true,
-        merito: true,
-        cadunico: true,
-        bancocarioca: true
-      },
-      tipoInput: 'text',
-      obrigatorio: true
-    },
-    {
-      nome: 'Unidade:', tipos: {
-        convenio: true,
-        sac: true,
-        merito: true,
-        cadunico: true,
-        bancocarioca: true
-      },
-      tipoInput: 'dropdown',
-      opcoesDropdown: ['Maria Angélica - Jardim Botânico', 'Lopes Quintas   - Jardim Botânico', 'Barra da Tijuca', 'Norte Shopping'],
-      obrigatorio: true
-    },
+
   ],
 
   [
+
+    {
+      nome: 'Esse responsável reside com o estudante?', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      obrigatorio: true,
+      tipoInput: 'dropdown',
+      opcoesDropdown: [
+        'Sim',
+        'Não'
+      ],
+    },
+
     {
       nome: 'Nome - Responsável 1', tipos: {
         convenio: true,
@@ -326,9 +339,9 @@ const camposFormulario: CampoFormulario[][] = [
       },
       tipoInput: 'dropdown',
       opcoesDropdown: [
-        '1SM',
-        '2SM',
-        '3ouMaisSM'],
+        '1 S/M',
+        '2 S/M',
+        '3 OU MAIS S/M'],
       obrigatorio: true
     },
     {
@@ -444,18 +457,23 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true,
       validacao: 'email'
     },
+
     {
-      nome: 'Mora com o responsável 2:?', tipos: {
+      nome: 'Responsável 2 reside com o estudante?', tipos: {
         convenio: true,
         sac: true,
         merito: true,
         cadunico: true,
         bancocarioca: true
       },
-      obrigatorio: false,
+      obrigatorio: true,
       tipoInput: 'dropdown',
-      opcoesDropdown: ['Sim', 'Não'],
+      opcoesDropdown: [
+        'Sim',
+        'Não'
+      ],
     },
+
     {
       nome: 'Nome completo - Responsável 2:', tipos: {
         convenio: true,
@@ -497,9 +515,9 @@ const camposFormulario: CampoFormulario[][] = [
       },
       tipoInput: 'dropdown',
       opcoesDropdown: [
-        '1SM',
-        '2SM',
-        '3ouMaisSM'],
+        '1 S/M',
+        '2 S/M',
+        '3 OU MAIS S/M'],
       obrigatorio: false
     },
     {
@@ -620,6 +638,23 @@ const camposFormulario: CampoFormulario[][] = [
   ],
 
   [
+    {
+      nome: 'Deseja copiar os dados de algum responsável?', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'dropdown',
+      opcoesDropdown: [
+        'Não',
+        'Responsável 1',
+        'Responsável 2',
+      ],
+      obrigatorio: false,
+    },
+
     {
       nome: 'Nome completo - Responsável financeiro:', tipos: {
         convenio: true,
@@ -921,17 +956,24 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
     return texto.trim().replace(/\s+/g, ' ');
   };
 
+  const opcoesUnidade = useMemo(() => {
+    return filiais
+      .filter(f => (escola === 'franco' ? f.coligada === 5 : f.coligada === 1))
+      .map(f => f.name);
+  }, [escola]);
+
+
   const corpo = {
     estudante: {
-      CD_Ano_Interesse: limparTexto(dados['Ano de interesse:']) || '',
+      CD_Ano_Interesse: limparTexto(dados['Ano de interesse da matrícula:']),
       NM_Aluno: limparTexto(dados['Nome completo do(a) estudante:']),
       DT_Nascimento: limparTexto(dados['Data de nascimento:']),
       NM_Naturalidade: limparTexto(dados['Naturalidade do(a) estudante:']),
       TX_Tipo_PBE: tipoPBE,
       CD_NIS: limparTexto(dados['NIS:']) || null,
-      CD_Matricula: limparTexto(dados['Matrícula:']) || null,
+      CD_Matricula: limparTexto(dados['Está matriculado no CEL Intercultural School?:']) || null,
       CD_Coligada,
-      CD_Ano_Escolar: limparTexto(dados['Ano escolar de interesse:']),
+      CD_Ano_Escolar: limparTexto(dados['Ano escolar de interesse do(a) estudante:']),
       TX_Logradouro: limparTexto(dados['Logradouro:']),
       NM_Bairro: limparTexto(dados['Bairro:']),
       NM_Cidade: limparTexto(dados['Cidade:']),
@@ -940,7 +982,7 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
       NR_Endereco: limparTexto(dados['Número:']) || '',
       CD_CEP: limparTexto(dados['CEP:']) || '',
       NM_Unidade: dados['Unidade:'] || null,
-      IN_Aluno: dados['Está matriculado no CEL Intercultural School/Colégio Franco em 2023?'] || '',
+      IN_Aluno: dados['Está matriculado no CEL Intercultural School?'] || '',
       TX_Endereco: `${dados['Endereço:'] || ''}${dados['Complemento:'] ? ' - complemento: ' + dados['Complemento:'] : ''}`.trim() || '',
     },
     filiacao1: {
@@ -1058,6 +1100,13 @@ export default function HomePage() {
     );
   }
 
+  const opcoesUnidade = useMemo(() => {
+    return filiais
+      .filter(f => (escola === 'franco' ? f.coligada === 5 : f.coligada === 1))
+      .map(f => f.name);
+  }, [escola]);
+
+
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [currentStep, setCurrentStep] = useState(0);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -1066,32 +1115,66 @@ export default function HomePage() {
     etapa.some(campo => campo.tipos[tipoPBE])
   ).length;
 
-  useEffect(() =>{
+  useEffect(() => {
     const ultimoTipo = localStorage.getItem('ultimoTipoPBE');
-    const ultimaEscola = localStorage.getItem('ultimaEscola')
+    const ultimaEscola = localStorage.getItem('ultimaEscola');
 
-    if (tipoPBE & escola){
+    if (tipoPBE && escola) {
       const mudouTipo = ultimoTipo !== tipoPBE;
       const mudouEscola = ultimaEscola !== escola;
 
-      if (mudouTipo || mudouEscola){
+      if (mudouTipo || mudouEscola) {
         setFormData({});
         setCurrentStep(0);
         localStorage.removeItem('formData');
 
-        localStorage.setItem('ultimotipoPBE', tipoPBE)
-        localStorage.setItem('ultimaEscola', escola)
+        localStorage.setItem('ultimoTipoPBE', tipoPBE);
+        localStorage.setItem('ultimaEscola', escola);
+      } else {
+        const dadosSalvos = localStorage.getItem('formData');
+        if (dadosSalvos) {
+          setFormData(JSON.parse(dadosSalvos));
+        }
       }
     }
-  })
+  }, [tipoPBE, escola]);
+
+  const opcoesAnoEscolar = useMemo(() => {
+    if (escola === 'franco') {
+      return filiais
+        .filter(f => f.coligada === 5)
+        .flatMap(filial =>
+          filial.segmentos.flatMap(segmento =>
+            segmento.series.map(serie => serie.name)
+          )
+        );
+    }
+
+    const unidadeSelecionada = formData['Unidade:'];
+    const filial = filiais.find(f => f.name === unidadeSelecionada);
+
+    if (!filial) return [];
+
+    return filial.segmentos.flatMap(segmento => segmento.series.map(serie => serie.name));
+  }, [formData['Unidade:']]);
+
+
+
 
   const camposVisiveis = camposFormulario[currentStep].filter(campo => {
     if (
       campo.nome === 'Matrícula:' &&
-      formData['Está matriculado no CEL Intercultural School/Colégio Franco em 2023?'] !== 'Sim'
+      formData['Está matriculado no CEL Intercultural School?'] !== 'Sim'
     ) {
       return false;
     }
+
+    /* if (
+      campo.nome === 'Matrícula:' &&
+      formData['Está matriculado no Colégio Franco?'] !== 'Sim'
+    ){
+      return false;
+    } */
 
     if (
       campo.nome === 'Unidade:' &&
@@ -1137,12 +1220,6 @@ export default function HomePage() {
 
   const validarNome = (nome: string) => /^[A-Za-zÀ-ÿ\s]+$/.test(nome);
 
-  /* useEffect(() => {
-    const dadosSalvos = localStorage.getItem('formData');
-    if (dadosSalvos) {
-      setFormData(JSON.parse(dadosSalvos));
-    }
-  }, []); */
 
   useEffect(() => {
     localStorage.setItem('formData', JSON.stringify(formData));
@@ -1231,6 +1308,64 @@ export default function HomePage() {
     setFormData(prev => {
       const novoFormData = { ...prev, [campo]: valorFormatado };
 
+      if (
+        campo === 'Deseja copiar os dados de algum responsável?' &&
+        (valor === 'Responsável 1' || valor === 'Responsável 2')
+      ) {
+        const prefixo = valor === 'Responsável 1' ? 'Responsável 1' : 'Responsável 2';
+        const camposOrigem = [
+          { origem: `Profissão - ${prefixo}`, destino: 'Profissão - Responsável financeiro:' },
+          { origem: `CPF - ${prefixo}:`, destino: 'CPF - Responsável financeiro:' },
+          { origem: `Telefone - ${prefixo}:`, destino: 'Telefone - Responsável financeiro:' },
+          { origem: `Renda presumida em n° de Salários Mínimos - ${prefixo}`, destino: 'Renda presumida em n° de Salários Mínimos - Responsável financeiro:' },
+          { origem: `CEP - ${prefixo}:`, destino: 'CEP - Responsável financeiro:' },
+          { origem: `Logradouro - ${prefixo}:`, destino: 'Logradouro - Responsável financeiro:' },
+          { origem: `Bairro - ${prefixo}:`, destino: 'Bairro - Responsável financeiro:' },
+          { origem: `Cidade - ${prefixo}:`, destino: 'Cidade - Responsável financeiro:' },
+          { origem: `Estado - ${prefixo}:`, destino: 'Estado - Responsável financeiro:' },
+          { origem: `Número - ${prefixo}:`, destino: 'Número - Responsável financeiro:' },
+          { origem: `Complemento - ${prefixo}:`, destino: 'Complemento - Responsável financeiro:' },
+        ];
+        camposOrigem.forEach(({ origem, destino }) => {
+          if (prev[origem]) {
+            novoFormData[destino] = prev[origem];
+          }
+        });
+      }
+
+      if (
+        campo === 'Esse responsável reside com o estudante?' &&
+        valor === 'Sim' &&
+        camposVisiveis.some(c => c.nome === 'Logradouro - Responsável 1:')
+      ) {
+        novoFormData['CEP - Responsável 1:'] = prev['CEP:'] || '';
+        novoFormData['Logradouro - Responsável 1:'] = prev['Logradouro:'] || '';
+        novoFormData['Bairro - Responsável 1:'] = prev['Bairro:'] || '';
+        novoFormData['Cidade - Responsável 1:'] = prev['Cidade:'] || '';
+        novoFormData['Estado - Responsável 1:'] = prev['Estado:'] || '';
+        novoFormData['Número - Responsável 1:'] = prev['Número:'] || '';
+        novoFormData['Complemento - Responsável 1:'] = prev['Complemento:'] || '';
+        // Atualiza o endereço concatenado
+        novoFormData['Endereço - Responsável 1:'] =
+          `${prev['Logradouro:'] || ''}, ${prev['Número:'] || ''}, ${prev['Bairro:'] || ''}, ${prev['Cidade:'] || ''}, ${prev['Estado:'] || ''} - ${prev['CEP:'] || ''}`.replace(/(, )+/g, ', ').replace(/^, |, $/g, '').replace(/, ,/g, ',');
+      }
+
+      if (
+        campo === 'Responsável 2 reside com o estudante?' &&
+        valor === 'Sim' &&
+        camposVisiveis.some(c => c.nome === 'Logradouro - Responsável 2:')
+      ) {
+        novoFormData['CEP - Responsável 2:'] = prev['CEP:'] || '';
+        novoFormData['Logradouro - Responsável 2:'] = prev['Logradouro:'] || '';
+        novoFormData['Bairro - Responsável 2:'] = prev['Bairro:'] || '';
+        novoFormData['Cidade - Responsável 2:'] = prev['Cidade:'] || '';
+        novoFormData['Estado - Responsável 2:'] = prev['Estado:'] || '';
+        novoFormData['Número - Responsável 2:'] = prev['Número:'] || '';
+        novoFormData['Complemento - Responsável 2:'] = prev['Complemento:'] || '';
+        novoFormData['Endereço - Responsável 2:'] =
+          `${prev['Logradouro:'] || ''}, ${prev['Número:'] || ''}, ${prev['Bairro:'] || ''}, ${prev['Cidade:'] || ''}, ${prev['Estado:'] || ''} - ${prev['CEP:'] || ''}`.replace(/(, )+/g, ', ').replace(/^, |, $/g, '').replace(/, ,/g, ',');
+      }
+
 
       if (
         [
@@ -1240,7 +1375,6 @@ export default function HomePage() {
         novoFormData['Endereço:'] =
           `${novoFormData['Logradouro:'] || ''}, ${novoFormData['Número:'] || ''}, ${novoFormData['Bairro:'] || ''}, ${novoFormData['Cidade:'] || ''}, ${novoFormData['Estado:'] || ''} - ${novoFormData['CEP:'] || ''}`.replace(/(, )+/g, ', ').replace(/^, |, $/g, '').replace(/, ,/g, ',');
       }
-
 
       if (
         [
@@ -1260,6 +1394,7 @@ export default function HomePage() {
         novoFormData['Endereço - Responsável 2:'] =
           `${novoFormData['Logradouro - Responsável 2:'] || ''}, ${novoFormData['Número - Responsável 2:'] || ''}, ${novoFormData['Bairro - Responsável 2:'] || ''}, ${novoFormData['Cidade - Responsável 2:'] || ''}, ${novoFormData['Estado - Responsável 2:'] || ''} - ${novoFormData['CEP - Responsável 2:'] || ''}`.replace(/(, )+/g, ', ').replace(/^, |, $/g, '').replace(/, ,/g, ',');
       }
+
 
       if (
         [
@@ -1314,37 +1449,6 @@ export default function HomePage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const copiarDadosResponsavel1 = () => {
-    const camposResponsavel1 = [
-      'Logradouro - Responsável 1:',
-      'Bairro - Responsável 1:',
-      'Cidade - Responsável 1:',
-      'Estado - Responsável 1:',
-      'CEP - Responsável 1:',
-      'Número - Responsável 1:',
-      'Endereço - Responsável 1:',
-    ];
-
-    const camposResponsavel2 = [
-      'Logradouro - Responsável 2:',
-      'Bairro - Responsável 2:',
-      'Cidade - Responsável 2:',
-      'Estado - Responsável 2:',
-      'CEP - Responsável 2:',
-      'Número - Responsável 2:',
-      'Endereço - Responsável 2:',
-    ];
-
-    const novosDados = { ...formData };
-
-    camposResponsavel1.forEach((campo, index) => {
-      if (formData[campo]) {
-        novosDados[camposResponsavel2[index]] = formData[campo];
-      }
-    });
-
-    setFormData(novosDados);
-  };
 
   const handleNext = async () => {
     if (validateFields()) {
@@ -1414,7 +1518,6 @@ export default function HomePage() {
 
 
 
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-100 p-6">
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-8">
@@ -1432,50 +1535,59 @@ export default function HomePage() {
             <BarraProgresso currentStep={currentStep} steps={stepsDinamicos} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
             {camposVisiveis.map((campo, index) => (
-              <div key={index}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {campo.nome} {campo.obrigatorio && <span className="text-red-500">*</span>}
-                </label>
-                {campo.tipoInput === 'dropdown' ? (
-                  <select
-                    className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm`}
-                    value={formData[campo.nome] || ''}
-                    onChange={(e) => handleChange(campo.nome, e.target.value)}
-                  >
-                    <option value="" disabled>{campo.placeholder || 'Selecione uma opção'}</option>
-                    {campo.opcoesDropdown?.map((opcao, idx) => (
-                      <option key={idx} value={opcao}>{opcao}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type={campo.tipoInput || 'text'}
-                    className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm`}
-                    value={formData[campo.nome] || ''}
-                    onChange={(e) => handleChange(campo.nome, e.target.value)}
-                    placeholder={campo.placeholder || ''}
-                    {...(campo.tipoInput === 'date' ? { max: '2024-12-31' } : {})}
-                  />
+              <React.Fragment key={index}>
+                {campo.nome === 'Ano de interesse da matrícula:' && (
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2 mt-6 col-span-2">Estudante</h3>
                 )}
-                {errors[campo.nome] && <p className="text-red-500 text-xs mt-1">{errors[campo.nome]}</p>}
+                {/*  */}
+                {campo.nome === 'Esse responsável reside com o estudante?' && (
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2 mt-6 col-span-2">Responsável 1</h3>
+                )}
+                {/*  */}
+                {campo.nome === 'Responsável 2 reside com o estudante?' && (
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2 mt-6 col-span-2">Responsável 2</h3>
+                )}
+                {/*  */}
+                {campo.nome === 'Deseja copiar os dados de algum responsável?' && (
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2 mt-6 col-span-2">Responsável Financeiro</h3>
+                )}
+                <div key={index}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {campo.nome} {campo.obrigatorio && <span className="text-red-500">*</span>}
+                  </label>
+                  {campo.tipoInput === 'dropdown' ? (
+                    <select
+                      className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm`}
+                      value={formData[campo.nome] || ''}
+                      onChange={(e) => handleChange(campo.nome, e.target.value)}
+                    >
+                      <option value="" disabled>{campo.placeholder || 'Selecione uma opção'}</option>
+                      {(campo.nome === 'Ano escolar de interesse do(a) estudante:'
+                        ? opcoesAnoEscolar
+                        : campo.nome === 'Unidade:'
+                          ? opcoesUnidade
+                          : campo.opcoesDropdown
+                      )?.map((opcao, idx) => (
+                        <option key={idx} value={opcao}>{opcao}</option>
+                      ))}
+                    </select>
 
+                  ) : (
+                    <input
+                      type={campo.tipoInput || 'text'}
+                      className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm`}
+                      value={formData[campo.nome] || ''}
+                      onChange={(e) => handleChange(campo.nome, e.target.value)}
+                      placeholder={campo.placeholder || ''}
+                      {...(campo.tipoInput === 'date' ? { max: '2024-12-31' } : {})}
+                    />
 
-              </div>
-
-
+                  )}
+                  {errors[campo.nome] && <p className="text-red-500 text-xs mt-1">{errors[campo.nome]}</p>}
+                </div>
+              </React.Fragment>
             ))}
 
-            {currentStep === 1 && (
-              <div className="mb-6">
-                <button
-                  type="button"
-                  onClick={copiarDadosResponsavel1}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-1 px-4 rounded-lg transition duration-200 mt-3"
-                >
-                  Reutilizar dados do responsável 1
-                </button>
-              </div>
-            )}
 
             <div className="flex justify-between mt-8">
               {currentStep > 0 && (
