@@ -37,6 +37,7 @@ interface CampoFormulario {
   opcoesDropdown?: string[];
   obrigatorio?: boolean;
   placeholder?: string;
+  validacao?: 'email';
 }
 
 const opcoesAnoEscolar = [
@@ -440,7 +441,8 @@ const camposFormulario: CampoFormulario[][] = [
         bancocarioca: true
       },
       tipoInput: 'text',
-      obrigatorio: true
+      obrigatorio: true,
+      validacao: 'email'
     },
     {
       nome: 'Mora com o responsável 2:?', tipos: {
@@ -612,7 +614,8 @@ const camposFormulario: CampoFormulario[][] = [
         bancocarioca: true
       },
       tipoInput: 'text',
-      obrigatorio: false
+      obrigatorio: false,
+      validacao: 'email'
     },
   ],
 
@@ -773,7 +776,8 @@ const camposFormulario: CampoFormulario[][] = [
         cadunico: true,
         bancocarioca: true
       },
-      obrigatorio: true
+      obrigatorio: true,
+      validacao: 'email'
     },
   ],
 
@@ -861,7 +865,7 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true
     },
     {
-      nome: 'Mora com quem?:', tipos: {
+      nome: 'Relação de pessoas que residem no mesmo endereço (Nome/Grau de parentesco/Idade): ', tipos: {
         convenio: false,
         sac: true,
         merito: false,
@@ -912,94 +916,99 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
     'Telefone - Responsável 2:',
   ].some(campo => dados[campo]?.trim());
 
+  const limparTexto = (texto: string | undefined | null): string => {
+    if (!texto) return '';
+    return texto.trim().replace(/\s+/g, ' ');
+  };
+
   const corpo = {
     estudante: {
-      CD_Ano_Interesse: dados['Ano de interesse:'] || '',
-      NM_Aluno: dados['Nome completo do(a) estudante:'] || '',
-      DT_Nascimento: dados['Data de nascimento:'] || '',
-      NM_Naturalidade: dados['Naturalidade do(a) estudante:'] || '',
+      CD_Ano_Interesse: limparTexto(dados['Ano de interesse:']) || '',
+      NM_Aluno: limparTexto(dados['Nome completo do(a) estudante:']),
+      DT_Nascimento: limparTexto(dados['Data de nascimento:']),
+      NM_Naturalidade: limparTexto(dados['Naturalidade do(a) estudante:']),
       TX_Tipo_PBE: tipoPBE,
-      CD_NIS: dados['NIS:'] || null,
-      CD_Matricula: dados['Matrícula:'] || null,
+      CD_NIS: limparTexto(dados['NIS:']) || null,
+      CD_Matricula: limparTexto(dados['Matrícula:']) || null,
       CD_Coligada,
-      CD_Ano_Escolar: dados['Ano escolar de interesse:'] || '',
-      TX_Logradouro: dados['Logradouro:'] || '',
-      NM_Bairro: dados['Bairro:'] || '',
-      NM_Cidade: dados['Cidade:'] || '',
-      SG_Estado: dados['Estado:'] || '',
-      TX_Complemento: dados['Complemento:'] || null,
-      NR_Endereco: dados['Número:'] || '',
-      CD_CEP: dados['CEP:'] || '',
-      NM_Unidade: dados['Unidade:'] || '',
+      CD_Ano_Escolar: limparTexto(dados['Ano escolar de interesse:']),
+      TX_Logradouro: limparTexto(dados['Logradouro:']),
+      NM_Bairro: limparTexto(dados['Bairro:']),
+      NM_Cidade: limparTexto(dados['Cidade:']),
+      SG_Estado: limparTexto(dados['Estado:']),
+      TX_Complemento: limparTexto(dados['Complemento:']) || null,
+      NR_Endereco: limparTexto(dados['Número:']) || '',
+      CD_CEP: limparTexto(dados['CEP:']) || '',
+      NM_Unidade: dados['Unidade:'] || null,
       IN_Aluno: dados['Está matriculado no CEL Intercultural School/Colégio Franco em 2023?'] || '',
       TX_Endereco: `${dados['Endereço:'] || ''}${dados['Complemento:'] ? ' - complemento: ' + dados['Complemento:'] : ''}`.trim() || '',
     },
     filiacao1: {
       TX_Tipo_Responsavel: 'FILIACAO1',
-      NM_Responsavel: dados['Nome - Responsável 1'],
-      NM_Profissao: dados['Profissão - Responsável 1'],
-      CD_CPF: dados['CPF - Responsável 1'],
-      TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável 1'],
-      TX_Logradouro: dados['Logradouro - Responsável 1:'],
+      NM_Responsavel: limparTexto(dados['Nome - Responsável 1']),
+      NM_Profissao: limparTexto(dados['Profissão - Responsável 1']),
+      CD_CPF: limparTexto(dados['CPF - Responsável 1']),
+      TX_Renda: limparTexto(dados['Renda presumida em n° de Salários Mínimos - Responsável 1']),
+      TX_Logradouro: limparTexto(dados['Logradouro - Responsável 1:']),
       TX_Endereco: `${dados['Endereço - Responsável 1:']}${dados['Complemento - Responsável 1:'] ? ' - complemento: ' + dados['Complemento - Responsável 1:'] : ''}`.trim() || null,
-      NR_Endereco: dados['Número - Responsável 1:'] || null,
-      TX_Complemento: dados['Complemento - Responsável 1:'] || null,
-      CD_CEP: dados['CEP - Responsável 1:'],
-      NM_Bairro: dados['Bairro - Responsável 1:'],
-      NM_Cidade: dados['Cidade - Responsável 1:'],
-      SG_Estado: dados['Estado - Responsável 1:'],
-      NR_Telefone: dados['Telefone - Responsável 1:'] || null,
-      TX_Email: dados['E-mail - Responsável 1:'],
+      NR_Endereco: limparTexto(dados['Número - Responsável 1:']) || null,
+      TX_Complemento: limparTexto(dados['Complemento - Responsável 1:']) || null,
+      CD_CEP: limparTexto(dados['CEP - Responsável 1:']),
+      NM_Bairro: limparTexto(dados['Bairro - Responsável 1:']),
+      NM_Cidade: limparTexto(dados['Cidade - Responsável 1:']),
+      SG_Estado: limparTexto(dados['Estado - Responsável 1:']),
+      NR_Telefone: limparTexto(dados['Telefone - Responsável 1:']) || null,
+      TX_Email: limparTexto(dados['E-mail - Responsável 1:']),
     },
 
     filiacao2: filiacao2Preenchido
       ? {
         TX_Tipo_Responsavel: 'FILIACAO2',
-        NM_Responsavel: dados['Nome completo - Responsável 2:'] || null,
-        NM_Profissao: dados['Profissão - Responsável 2:'] || null,
-        CD_CPF: dados['CPF - Responsável 2:'] || null,
-        TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável 2:'] || null,
+        NM_Responsavel: limparTexto(dados['Nome completo - Responsável 2:']) || null,
+        NM_Profissao: limparTexto(dados['Profissão - Responsável 2:']) || null,
+        CD_CPF: limparTexto(dados['CPF - Responsável 2:']) || null,
+        TX_Renda: limparTexto(dados['Renda presumida em n° de Salários Mínimos - Responsável 2:']) || null,
         TX_Endereco: `${dados['Endereço - Responsável 2:'] || ''}${dados['Complemento - Responsável 2:'] ? ' - complemento: ' + dados['Complemento - Responsável 2:'] : ''}`.trim() || null,
-        TX_Logradouro: dados['Logradouro - Responsável 2:'] || null,
-        NR_Endereco: dados['Número - Responsável 2:'] || null,
-        TX_Complemento: dados['Complemento - Responsável 2:'] || '',
-        CD_CEP: dados['CEP - Responsável 2:'] || null,
-        NM_Bairro: dados['Bairro - Responsável 2:'] || null,
-        NM_Cidade: dados['Cidade - Responsável 2:'] || null,
-        SG_Estado: dados['Estado - Responsável 2:'] || null,
-        NR_Telefone: dados['Telefone - Responsável 2:'] || null,
-        TX_Email: dados['E-mail - Responsável 2:'] || null,
+        TX_Logradouro: limparTexto(dados['Logradouro - Responsável 2:']) || null,
+        NR_Endereco: limparTexto(dados['Número - Responsável 2:']) || null,
+        TX_Complemento: limparTexto(dados['Complemento - Responsável 2:']) || '',
+        CD_CEP: limparTexto(dados['CEP - Responsável 2:']) || null,
+        NM_Bairro: limparTexto(dados['Bairro - Responsável 2:']) || null,
+        NM_Cidade: limparTexto(dados['Cidade - Responsável 2:']) || null,
+        SG_Estado: limparTexto(dados['Estado - Responsável 2:']) || null,
+        NR_Telefone: limparTexto(dados['Telefone - Responsável 2:']) || null,
+        TX_Email: limparTexto(dados['E-mail - Responsável 2:']) || null,
       }
       : null,
     responsavelFinanceiro: {
       TX_Tipo_Responsavel: 'RESPONSAVEL FINANCEIRO',
-      NM_Responsavel: dados['Nome completo - Responsável financeiro:'],
-      NM_Profissao: dados['Profissão - Responsável financeiro:'],
-      CD_CPF: dados['CPF - Responsável financeiro:'],
-      TX_Renda: dados['Renda presumida em n° de Salários Mínimos - Responsável financeiro:'],
+      NM_Responsavel: limparTexto(dados['Nome completo - Responsável financeiro:']),
+      NM_Profissao: limparTexto(dados['Profissão - Responsável financeiro:']),
+      CD_CPF: limparTexto(dados['CPF - Responsável financeiro:']),
+      TX_Renda: limparTexto(dados['Renda presumida em n° de Salários Mínimos - Responsável financeiro:']),
       TX_Endereco: `${dados['Endereço - Responsável financeiro:']}${dados['Complemento - Responsável financeiro:'] ? ' - complemento: ' + dados['Complemento - Responsável financeiro:'] : ''}`.trim() || '',
-      TX_Logradouro: dados['Logradouro - Responsável financeiro:'],
-      NR_Endereco: dados['Número - Responsável financeiro:'],
-      TX_Complemento: dados['Complemento - Responsável financeiro:'] || null,
-      CD_CEP: dados['CEP - Responsável financeiro:'],
-      NM_Bairro: dados['Bairro - Responsável financeiro:'],
-      NM_Cidade: dados['Cidade - Responsável financeiro:'],
-      SG_Estado: dados['Estado - Responsável financeiro:'],
-      NR_Telefone: dados['Telefone - Responsável financeiro:'],
-      TX_Email: dados['E-mail - Responsável financeiro:'],
+      TX_Logradouro: limparTexto(dados['Logradouro - Responsável financeiro:']),
+      NR_Endereco: limparTexto(dados['Número - Responsável financeiro:']),
+      TX_Complemento: limparTexto(dados['Complemento - Responsável financeiro:']) || null,
+      CD_CEP: limparTexto(dados['CEP - Responsável financeiro:']),
+      NM_Bairro: limparTexto(dados['Bairro - Responsável financeiro:']),
+      NM_Cidade: limparTexto(dados['Cidade - Responsável financeiro:']),
+      SG_Estado: limparTexto(dados['Estado - Responsável financeiro:']),
+      NR_Telefone: limparTexto(dados['Telefone - Responsável financeiro:']),
+      TX_Email: limparTexto(dados['E-mail - Responsável financeiro:']),
     },
 
     informacoesAdicionais: {
-      TX_Aluno_Reside_Com: dados['Aluno reside com'] || null,
-      IN_Orfao: dados['Se orfão, indicar:'] || null,
-      IN_Solicitou_Bolsa_Antes: dados['Já solicitou bolsa de estudos?'] || '',
-      CD_Bolsa_Ano: dados['Se sim, em que ano?'] || null,
-      TX_Bolsa_Percentual: dados['Se sim, qual percentual da bolsa?'] || null,
-      IN_Irmaos_Alunos: dados['Irmãos que sejam alunos da escola (Nome completo/Série):'] || null,
-      TX_Relacao_Residentes: dados['Mora com quem?:'] || null,
-      TX_Relacao_Despesas: dados['Relacione as despesas da família:'] || null,
-      TX_Motivo_Bolsa: dados['Por que a família está solicitando a bolsa de estudos?'] || null,
-      TX_Observacoes_Gerais: dados['Observações Gerais'] || null,
+      TX_Aluno_Reside_Com: limparTexto(dados['Aluno reside com']) || null,
+      IN_Orfao: limparTexto(dados['Se orfão, indicar:']) || null,
+      IN_Solicitou_Bolsa_Antes: limparTexto(dados['Já solicitou bolsa de estudos?']) || '',
+      CD_Bolsa_Ano: limparTexto(dados['Se sim, em que ano?']) || null,
+      TX_Bolsa_Percentual: limparTexto(dados['Se sim, qual percentual da bolsa?']) || null,
+      IN_Irmaos_Alunos: limparTexto(dados['Irmãos que sejam alunos da escola (Nome completo/Série):']) || null,
+      TX_Relacao_Residentes: limparTexto(dados['Relação de pessoas que residem no mesmo endereço (Nome/Grau de parentesco/Idade): ']) || null,
+      TX_Relacao_Despesas: limparTexto(dados['Relacione as despesas da família:']) || null,
+      TX_Motivo_Bolsa: limparTexto(dados['Por que a família está solicitando a bolsa de estudos?']) || null,
+      TX_Observacoes_Gerais: limparTexto(dados['Observações Gerais']) || null,
     }
   };
 
@@ -1057,6 +1066,25 @@ export default function HomePage() {
     etapa.some(campo => campo.tipos[tipoPBE])
   ).length;
 
+  useEffect(() =>{
+    const ultimoTipo = localStorage.getItem('ultimoTipoPBE');
+    const ultimaEscola = localStorage.getItem('ultimaEscola')
+
+    if (tipoPBE & escola){
+      const mudouTipo = ultimoTipo !== tipoPBE;
+      const mudouEscola = ultimaEscola !== escola;
+
+      if (mudouTipo || mudouEscola){
+        setFormData({});
+        setCurrentStep(0);
+        localStorage.removeItem('formData');
+
+        localStorage.setItem('ultimotipoPBE', tipoPBE)
+        localStorage.setItem('ultimaEscola', escola)
+      }
+    }
+  })
+
   const camposVisiveis = camposFormulario[currentStep].filter(campo => {
     if (
       campo.nome === 'Matrícula:' &&
@@ -1109,16 +1137,18 @@ export default function HomePage() {
 
   const validarNome = (nome: string) => /^[A-Za-zÀ-ÿ\s]+$/.test(nome);
 
-  useEffect(() => {
+  /* useEffect(() => {
     const dadosSalvos = localStorage.getItem('formData');
     if (dadosSalvos) {
       setFormData(JSON.parse(dadosSalvos));
     }
-  }, []);
+  }, []); */
 
   useEffect(() => {
     localStorage.setItem('formData', JSON.stringify(formData));
   }, [formData]);
+
+
 
   const buscarEndereco = async (cep: string, campo: string) => {
     if (cep.length === 9) {
@@ -1129,7 +1159,7 @@ export default function HomePage() {
         const { logradouro, bairro, localidade, uf, erro } = await response.json();
 
         if (erro) {
-          console.error('CEP não encontrado');
+          toast.error('CEP não encontrado');
           return;
         }
 
@@ -1163,7 +1193,7 @@ export default function HomePage() {
 
         const campos = camposMap[campo];
         if (!campos) {
-          console.warn('Campo de CEP não mapeado:', campo);
+          toast.error('Campo de CEP não mapeado');
           return;
         }
 
@@ -1175,7 +1205,7 @@ export default function HomePage() {
           [campos.estado]: uf || '',
         }));
       } catch (error) {
-        console.error('Erro ao buscar endereço:', error);
+        toast.error('Erro ao buscar endereço');
       }
     }
   };
@@ -1272,9 +1302,14 @@ export default function HomePage() {
       if (campo.nome.includes('Nome completo') && valor && !validarNome(valor)) {
         newErrors[campo.nome] = 'O nome deve conter apenas letras e espaços.';
       }
-    });
 
-    console.log('Erros de validação:', newErrors);
+      if (campo.validacao === 'email' && valor) {
+        const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!regexEmail.test(valor)) {
+          newErrors[campo.nome] = 'Digite um e-mail válido.';
+        }
+      }
+    });
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -1330,11 +1365,10 @@ export default function HomePage() {
           if (!res.ok) {
             const erro = await res.json();
             toast.error(`Erro: ${erro?.message || 'Erro ao enviar o formulário'}`);
-            return; // cancela a execução
+            return;
           }
 
           toast.success('Formulário enviado com sucesso!');
-          console.log('Formulário enviado com sucesso!');
           setFormSubmitted(true);
           localStorage.removeItem('formData');
 
@@ -1345,6 +1379,7 @@ export default function HomePage() {
               ? error.message
               : 'Verifique o log de erro';
           toast.error(`Erro no envio do formulário!`);
+
         }
       }
     } else {
@@ -1365,7 +1400,10 @@ export default function HomePage() {
       { nome: 'Responsável financeiro', indice: 2 },
       { nome: 'Informações adicionais', indice: 3 }
     ];
-  
+
+
+
+
     return etapas
       .filter((_, idx) =>
         camposFormulario[idx]?.some(campo => campo.tipos[tipoPBE])
@@ -1373,6 +1411,8 @@ export default function HomePage() {
       .map(e => e.nome)
       .concat('Finalizado');
   }, [tipoPBE]);
+
+
 
 
   return (
