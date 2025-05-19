@@ -1,6 +1,10 @@
-const steps = ['Cadastrando estudante', 'Filiação', 'Responsável financeiro', 'Informações adicionais', 'Finalizado'];
-
-export default function BarraProgresso({ currentStep }: { currentStep: number }) {
+export default function BarraProgresso({
+  currentStep,
+  steps,
+}: {
+  currentStep: number;
+  steps: string[];
+}) {
   const percentual = (currentStep / (steps.length - 1)) * 100;
 
   return (
@@ -13,7 +17,12 @@ export default function BarraProgresso({ currentStep }: { currentStep: number })
       </div>
       <div className="flex justify-between text-xs text-gray-600 mt-2 font-medium">
         {steps.map((step, index) => (
-          <div key={index} className={`text-center w-1/5 ${index <= currentStep ? 'text-blue-600' : 'text-gray-600 font-bold'}`}>
+          <div
+            key={index}
+            className={`text-center w-full ${
+              index <= currentStep ? 'text-blue-600' : 'text-gray-600 font-bold'
+            }`}
+          >
             {step}
           </div>
         ))}

@@ -6,7 +6,7 @@ Parâmetros de URL:
 
 http://localhost:3000/?escola=cel&tipoPBE=convenio
 http://localhost:3000/?escola=cel&tipoPBE=sac
-http://localhost:3000/?escola=cel&tipoPBE=Mérito
+http://localhost:3000/?escola=cel&tipoPBE=merito
 http://localhost:3000/?escola=cel&tipoPBE=sac
 http://localhost:3000/?escola=cel&tipoPBE=cadunico
 http://localhost:3000/?escola=cel&tipoPBE=bancocarioca
@@ -21,7 +21,7 @@ http://localhost:3000/?escola=franco&tipoPBE=convenio
 "use client";
 
 import { useSearchParams } from 'next/navigation';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useState, useEffect } from 'react';
 import BarraProgresso from '@/components/ui/BarraProgresso';
 import { Bounce, ToastContainer, toast } from 'react-toastify';
@@ -1344,7 +1344,7 @@ export default function HomePage() {
             error instanceof Error
               ? error.message
               : 'Verifique o log de erro';
-          toast.error(`Erro inesperado: ${errorMessage}`);
+          toast.error(`Erro no envio do formulário!`);
         }
       }
     } else {
@@ -1358,15 +1358,22 @@ export default function HomePage() {
     }
   };
 
-  /*   function montarEndereco(prefixo = '') {
-      const logradouro = formData[`${prefixo}Logradouro${prefixo ? ' -' : ':'}`] || '';
-      const numero = formData[`${prefixo}Número${prefixo ? ' -' : ':'}`] || '';
-      const bairro = formData[`${prefixo}Bairro${prefixo ? ' -' : ':'}`] || '';
-      const cidade = formData[`${prefixo}Cidade${prefixo ? ' -' : ':'}`] || '';
-      const estado = formData[`${prefixo}Estado${prefixo ? ' -' : ':'}`] || '';
-      const cep = formData[`${prefixo}CEP${prefixo ? ' -' : ':'}`] || '';
-      return `${logradouro}, ${numero}, ${bairro}, ${cidade}, ${estado} - ${cep}`.replace(/(, )+/g, ', ').replace(/^, |, $/g, '').replace(/, ,/g, ',');
-    } */
+  const stepsDinamicos = useMemo(() => {
+    const etapas = [
+      { nome: 'Cadastrando estudante', indice: 0 },
+      { nome: 'Filiação', indice: 1 },
+      { nome: 'Responsável financeiro', indice: 2 },
+      { nome: 'Informações adicionais', indice: 3 }
+    ];
+  
+    return etapas
+      .filter((_, idx) =>
+        camposFormulario[idx]?.some(campo => campo.tipos[tipoPBE])
+      )
+      .map(e => e.nome)
+      .concat('Finalizado');
+  }, [tipoPBE]);
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-100 p-6">
@@ -1382,7 +1389,7 @@ export default function HomePage() {
           </div>
         ) : (
           <form>
-            <BarraProgresso currentStep={currentStep} />
+            <BarraProgresso currentStep={currentStep} steps={stepsDinamicos} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
             {camposVisiveis.map((campo, index) => (
               <div key={index}>
