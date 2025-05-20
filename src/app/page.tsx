@@ -42,7 +42,7 @@ interface CampoFormulario {
   obrigatorio?: boolean;
   placeholder?: string;
   validacao?: 'email';
-  
+
 }
 
 const opcoesAnoEscolar = [
@@ -65,6 +65,8 @@ const opcoesAnoEscolar = [
   '2ª série do Ensino Médio',
   '3ª série do Ensino Médio',
 ];
+
+
 
 
 
@@ -96,17 +98,17 @@ const camposFormulario: CampoFormulario[][] = [
     },
 
     {
-       nome: 'Está matriculado no colégio franco?', tipos: {
-         convenio: true,
-         sac: true,
-         merito: true,
-         cadunico: true,
-         bancocarioca: true
-       },
-       tipoInput: 'dropdown',
-       opcoesDropdown: ['Sim', 'Não'],
-       obrigatorio: true
-     },
+      nome: 'Está matriculado no colégio franco?', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'dropdown',
+      opcoesDropdown: ['Sim', 'Não'],
+      obrigatorio: true
+    },
 
     {
       nome: 'Matrícula:', tipos: {
@@ -1147,10 +1149,6 @@ export default function HomePage() {
         );
     }
 
-   /*  const podeSelecionarAnoEscolar = useMemo(() => {
-      return !!formData['Ano de interesse da matrícula:'];
-    }, [formData['Ano de interesse da matrícula:']]); */
-
     const unidadeSelecionada = formData['Unidade:'];
     const filial = filiais.find(f => f.name === unidadeSelecionada);
 
@@ -1159,7 +1157,9 @@ export default function HomePage() {
     return filial.segmentos.flatMap(segmento => segmento.series.map(serie => serie.name));
   }, [formData['Unidade:']]);
 
-
+  const podeSelecionarAnoEscolar = useMemo(() => {
+    return !!formData['Ano de interesse da matrícula:'];
+  }, [formData['Ano de interesse da matrícula:']]);
 
 
   const camposVisiveis = camposFormulario[currentStep].filter(campo => {
@@ -1174,14 +1174,14 @@ export default function HomePage() {
     if (
       campo.nome === 'Está matriculado no CEL Intercultural School?' &&
       escola !== 'cel'
-    ){
+    ) {
       return false;
     }
 
     if (
       campo.nome === 'Está matriculado no colégio franco?' &&
       escola !== 'franco'
-    ){
+    ) {
       return false
     }
 
@@ -1516,8 +1516,6 @@ export default function HomePage() {
     ];
 
 
-
-
     return etapas
       .filter((_, idx) =>
         camposFormulario[idx]?.some(campo => campo.tipos[tipoPBE])
@@ -1569,25 +1567,38 @@ export default function HomePage() {
                       {campo.nome} {campo.obrigatorio && <span className="text-red-500">*</span>}
                     </label>
                     {campo.tipoInput === 'dropdown' ? (
-                      <select
+                      <div className="relative w-full">
+                        <select
+                          disabled={campo.nome === 'Ano escolar de interesse do(a) estudante:' && !podeSelecionarAnoEscolar}
+                          className={`w-full border rounded-lg px-4 py-2 pr-10 focus:outline-none shadow-sm
+        ${!podeSelecionarAnoEscolar && campo.nome === 'Ano escolar de interesse do(a) estudante:'
+                              ? 'bg-gray-100 cursor-not-allowed text-gray-500 border-gray-300'
+                              : 'border-gray-300 focus:ring-2 focus:ring-blue-500'}
+        ${errors[campo.nome] ? 'border-red-700' : ''}
+      `}
+                          value={formData[campo.nome] || ''}
+                          onChange={(e) => handleChange(campo.nome, e.target.value)}
+                        >
+                          <option value="" disabled>
+                            {campo.placeholder || 'Selecione uma opção'}
+                          </option>
+                          {(campo.nome === 'Ano escolar de interesse do(a) estudante:'
+                            ? opcoesAnoEscolar
+                            : campo.nome === 'Unidade:'
+                              ? opcoesUnidade
+                              : campo.opcoesDropdown
+                          )?.map((opcao, idx) => (
+                            <option key={idx} value={opcao}>
+                              {opcao}
+                            </option>
+                          ))}
+                        </select>
 
-                        /* disabled={campo.nome === 'Ano escolar de interesse do(a) estudante:' && !podeSelecionarAnoEscolar} */
-
-                        className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm`}
-                        value={formData[campo.nome] || ''}
-                        onChange={(e) => handleChange(campo.nome, e.target.value)}
-                      >
-                        <option value="" disabled>{campo.placeholder || 'Selecione uma opção'}</option>
-                        {(campo.nome === 'Ano escolar de interesse do(a) estudante:'
-                          ? opcoesAnoEscolar
-                          : campo.nome === 'Unidade:'
-                            ? opcoesUnidade
-                            : campo.opcoesDropdown
-                        )?.map((opcao, idx) => (
-                          <option key={idx} value={opcao}>{opcao}</option>
-                        ))}
-                      </select>
-
+                        {campo.nome === 'Ano escolar de interesse do(a) estudante:' && !podeSelecionarAnoEscolar && (
+                          <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       <input
                         type={campo.tipoInput || 'text'}
@@ -1641,7 +1652,7 @@ export default function HomePage() {
         theme="colored"
         transition={Bounce}
       />
-    </div>
+    </div >
 
   );
 }
