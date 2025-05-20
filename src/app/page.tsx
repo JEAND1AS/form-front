@@ -42,6 +42,7 @@ interface CampoFormulario {
   obrigatorio?: boolean;
   placeholder?: string;
   validacao?: 'email';
+  
 }
 
 const opcoesAnoEscolar = [
@@ -94,18 +95,18 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true
     },
 
-   /*  {
-      nome: 'Está matriculado no Franco?', tipos: {
-        convenio: true,
-        sac: true,
-        merito: true,
-        cadunico: true,
-        bancocarioca: true
-      },
-      tipoInput: 'dropdown',
-      opcoesDropdown: ['Sim', 'Não'],
-      obrigatorio: true
-    }, */
+    {
+       nome: 'Está matriculado no colégio franco?', tipos: {
+         convenio: true,
+         sac: true,
+         merito: true,
+         cadunico: true,
+         bancocarioca: true
+       },
+       tipoInput: 'dropdown',
+       opcoesDropdown: ['Sim', 'Não'],
+       obrigatorio: true
+     },
 
     {
       nome: 'Matrícula:', tipos: {
@@ -117,6 +118,17 @@ const camposFormulario: CampoFormulario[][] = [
       },
       tipoInput: 'number',
       obrigatorio: true
+    },
+    {
+      nome: 'Unidade:', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'dropdown',
+      obrigatorio: true,
     },
     {
       nome: 'Ano escolar de interesse do(a) estudante:', tipos: {
@@ -164,17 +176,6 @@ const camposFormulario: CampoFormulario[][] = [
       },
       tipoInput: 'text',
       obrigatorio: true
-    },
-    {
-      nome: 'Unidade:', tipos: {
-        convenio: true,
-        sac: true,
-        merito: true,
-        cadunico: true,
-        bancocarioca: true
-      },
-      tipoInput: 'dropdown',
-      obrigatorio: true,
     },
     {
       nome: 'NIS:', tipos: {
@@ -897,7 +898,7 @@ const camposFormulario: CampoFormulario[][] = [
         cadunico: true,
         bancocarioca: true
       },
-      obrigatorio: true
+      obrigatorio: false
     },
     {
       nome: 'Relação de pessoas que residem no mesmo endereço (Nome/Grau de parentesco/Idade): ', tipos: {
@@ -956,11 +957,7 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
     return texto.trim().replace(/\s+/g, ' ');
   };
 
-  const opcoesUnidade = useMemo(() => {
-    return filiais
-      .filter(f => (escola === 'franco' ? f.coligada === 5 : f.coligada === 1))
-      .map(f => f.name);
-  }, [escola]);
+
 
 
   const corpo = {
@@ -1150,6 +1147,10 @@ export default function HomePage() {
         );
     }
 
+   /*  const podeSelecionarAnoEscolar = useMemo(() => {
+      return !!formData['Ano de interesse da matrícula:'];
+    }, [formData['Ano de interesse da matrícula:']]); */
+
     const unidadeSelecionada = formData['Unidade:'];
     const filial = filiais.find(f => f.name === unidadeSelecionada);
 
@@ -1164,17 +1165,25 @@ export default function HomePage() {
   const camposVisiveis = camposFormulario[currentStep].filter(campo => {
     if (
       campo.nome === 'Matrícula:' &&
-      formData['Está matriculado no CEL Intercultural School?'] !== 'Sim'
+      formData['Está matriculado no CEL Intercultural School?'] !== 'Sim' &&
+      formData['Está matriculado no colégio franco?'] !== 'Sim'
     ) {
       return false;
     }
 
-    /* if (
-      campo.nome === 'Matrícula:' &&
-      formData['Está matriculado no Colégio Franco?'] !== 'Sim'
+    if (
+      campo.nome === 'Está matriculado no CEL Intercultural School?' &&
+      escola !== 'cel'
     ){
       return false;
-    } */
+    }
+
+    if (
+      campo.nome === 'Está matriculado no colégio franco?' &&
+      escola !== 'franco'
+    ){
+      return false
+    }
 
     if (
       campo.nome === 'Unidade:' &&
@@ -1314,6 +1323,7 @@ export default function HomePage() {
       ) {
         const prefixo = valor === 'Responsável 1' ? 'Responsável 1' : 'Responsável 2';
         const camposOrigem = [
+          { origem: `Nome - ${prefixo}`, destino: 'Nome completo - Responsável financeiro:' },
           { origem: `Profissão - ${prefixo}`, destino: 'Profissão - Responsável financeiro:' },
           { origem: `CPF - ${prefixo}:`, destino: 'CPF - Responsável financeiro:' },
           { origem: `Telefone - ${prefixo}:`, destino: 'Telefone - Responsável financeiro:' },
@@ -1523,71 +1533,79 @@ export default function HomePage() {
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-8">
         <div className="mb-8">
         </div>
+
         {formSubmitted ? (
-          <div className="text-center p-6 border border-green-300 bg-green-50 rounded-lg">
+          <div className="text-center p-6 border border-green-300 bg-green-50 rounded-lg col-span-2">
             <h2 className="text-xl font-semibold text-green-700 mb-2">
               Formulário enviado com sucesso!
             </h2>
             <p className="text-green-600">Agradecemos pelo envio. Entraremos em contato.</p>
           </div>
+
         ) : (
           <form>
             <BarraProgresso currentStep={currentStep} steps={stepsDinamicos} />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-            {camposVisiveis.map((campo, index) => (
-              <React.Fragment key={index}>
-                {campo.nome === 'Ano de interesse da matrícula:' && (
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2 mt-6 col-span-2">Estudante</h3>
-                )}
-                {/*  */}
-                {campo.nome === 'Esse responsável reside com o estudante?' && (
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2 mt-6 col-span-2">Responsável 1</h3>
-                )}
-                {/*  */}
-                {campo.nome === 'Responsável 2 reside com o estudante?' && (
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2 mt-6 col-span-2">Responsável 2</h3>
-                )}
-                {/*  */}
-                {campo.nome === 'Deseja copiar os dados de algum responsável?' && (
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2 mt-6 col-span-2">Responsável Financeiro</h3>
-                )}
-                <div key={index}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {campo.nome} {campo.obrigatorio && <span className="text-red-500">*</span>}
-                  </label>
-                  {campo.tipoInput === 'dropdown' ? (
-                    <select
-                      className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm`}
-                      value={formData[campo.nome] || ''}
-                      onChange={(e) => handleChange(campo.nome, e.target.value)}
-                    >
-                      <option value="" disabled>{campo.placeholder || 'Selecione uma opção'}</option>
-                      {(campo.nome === 'Ano escolar de interesse do(a) estudante:'
-                        ? opcoesAnoEscolar
-                        : campo.nome === 'Unidade:'
-                          ? opcoesUnidade
-                          : campo.opcoesDropdown
-                      )?.map((opcao, idx) => (
-                        <option key={idx} value={opcao}>{opcao}</option>
-                      ))}
-                    </select>
-
-                  ) : (
-                    <input
-                      type={campo.tipoInput || 'text'}
-                      className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm`}
-                      value={formData[campo.nome] || ''}
-                      onChange={(e) => handleChange(campo.nome, e.target.value)}
-                      placeholder={campo.placeholder || ''}
-                      {...(campo.tipoInput === 'date' ? { max: '2024-12-31' } : {})}
-                    />
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+              {camposVisiveis.map((campo, index) => (
+                <React.Fragment key={index}>
+                  {campo.nome === 'Ano de interesse da matrícula:' && (
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2 mt-6 col-span-2">Estudante</h3>
                   )}
-                  {errors[campo.nome] && <p className="text-red-500 text-xs mt-1">{errors[campo.nome]}</p>}
-                </div>
-              </React.Fragment>
-            ))}
 
+                  {campo.nome === 'Esse responsável reside com o estudante?' && (
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2 mt-6 col-span-2">Responsável 1</h3>
+                  )}
+
+                  {campo.nome === 'Responsável 2 reside com o estudante?' && (
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2 mt-6 col-span-2">Responsável 2</h3>
+                  )}
+
+                  {campo.nome === 'Deseja copiar os dados de algum responsável?' && (
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2 mt-6 col-span-2">Responsável Financeiro</h3>
+                  )}
+
+                  <div key={index} className="w-full">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 break-words w-full">
+                      {campo.nome} {campo.obrigatorio && <span className="text-red-500">*</span>}
+                    </label>
+                    {campo.tipoInput === 'dropdown' ? (
+                      <select
+
+                        /* disabled={campo.nome === 'Ano escolar de interesse do(a) estudante:' && !podeSelecionarAnoEscolar} */
+
+                        className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm`}
+                        value={formData[campo.nome] || ''}
+                        onChange={(e) => handleChange(campo.nome, e.target.value)}
+                      >
+                        <option value="" disabled>{campo.placeholder || 'Selecione uma opção'}</option>
+                        {(campo.nome === 'Ano escolar de interesse do(a) estudante:'
+                          ? opcoesAnoEscolar
+                          : campo.nome === 'Unidade:'
+                            ? opcoesUnidade
+                            : campo.opcoesDropdown
+                        )?.map((opcao, idx) => (
+                          <option key={idx} value={opcao}>{opcao}</option>
+                        ))}
+                      </select>
+
+                    ) : (
+                      <input
+                        type={campo.tipoInput || 'text'}
+                        className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm`}
+                        value={formData[campo.nome] || ''}
+                        onChange={(e) => handleChange(campo.nome, e.target.value)}
+                        placeholder={campo.placeholder || ''}
+                        {...(campo.tipoInput === 'date' ? { max: '2024-12-31' } : {})}
+                      />
+                    )}
+
+                    {errors[campo.nome] && (
+                      <p className="text-red-500 text-xs mt-1 col-span-2">{errors[campo.nome]}</p>
+                    )}
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
 
             <div className="flex justify-between mt-8">
               {currentStep > 0 && (
@@ -1624,6 +1642,7 @@ export default function HomePage() {
         transition={Bounce}
       />
     </div>
+
   );
 }
 
