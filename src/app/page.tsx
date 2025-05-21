@@ -45,6 +45,8 @@ interface CampoFormulario {
 
 }
 
+
+
 const opcoesAnoEscolar = [
   'Berçário I (Bebês a partir de 3 meses de idade)',
   'Berçário II (Bebês a partir de 1 ano e meio de idade com avaliação da equipe pedagógica)',
@@ -1100,11 +1102,7 @@ export default function HomePage() {
     );
   }
 
-  const opcoesUnidade = useMemo(() => {
-    return filiais
-      .filter(f => (escola === 'franco' ? f.coligada === 5 : f.coligada === 1))
-      .map(f => f.name);
-  }, [escola]);
+ 
 
 
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
@@ -1114,6 +1112,22 @@ export default function HomePage() {
   const totalEtapasVisiveis = camposFormulario.filter(etapa =>
     etapa.some(campo => campo.tipos[tipoPBE])
   ).length;
+
+  const opcoesAnoInteresse = useMemo(() => {
+  return tipoPBE === 'bancocarioca' ? ['2024'] : ['2024', '2025', '2026'];
+}, [tipoPBE]);
+
+ const opcoesUnidade = useMemo(() => {
+  const anoInteresse = formData['Ano de interesse da matrícula:'];
+
+  if (tipoPBE === 'bancocarioca') {
+    return ['Maria Angélica - Jardim Botânico'];
+  }
+
+  return filiais
+    .filter(f => (escola === 'franco' ? f.coligada === 5 : f.coligada === 1))
+    .map(f => f.name);
+}, [escola, tipoPBE, formData['Ano de interesse da matrícula:']]);
 
   useEffect(() => {
     const ultimoTipo = localStorage.getItem('ultimoTipoPBE');
@@ -1140,23 +1154,39 @@ export default function HomePage() {
   }, [tipoPBE, escola]);
 
   const opcoesAnoEscolar = useMemo(() => {
-    if (escola === 'franco') {
-      return filiais
-        .filter(f => f.coligada === 5)
-        .flatMap(filial =>
-          filial.segmentos.flatMap(segmento =>
-            segmento.series.map(serie => serie.name)
-          )
-        );
-    }
+  const anoInteresse = formData['Ano de interesse da matrícula:'];
+  const unidadeSelecionada = formData['Unidade:'];
+  const filial = filiais.find(f => f.name === unidadeSelecionada);
 
-    const unidadeSelecionada = formData['Unidade:'];
-    const filial = filiais.find(f => f.name === unidadeSelecionada);
+  if (!filial) return [];
 
-    if (!filial) return [];
+  const todasSeries = filial.segmentos.flatMap(s => s.series);
 
-    return filial.segmentos.flatMap(segmento => segmento.series.map(serie => serie.name));
-  }, [formData['Unidade:']]);
+  // 🔒 Bancocarioca restrições
+  if (escola === 'cel' && tipoPBE === 'bancocarioca') {
+    if (anoInteresse !== '2024') return []; 
+    if (!filial.name.includes('Maria Angélica')) return [];
+
+    return todasSeries
+      .filter(s => ['1S2', '2S2', '3S2'].includes(s.code))
+      .map(s => s.name);
+  }
+
+  // 🔒 Se ano de interesse for 2024, mostrar apenas séries específicas
+  if (anoInteresse === '2024') {
+    const codigosPermitidos = ['MT1', 'MT2', 'PE1', 'PE2', '1A1'];
+    return todasSeries
+      .filter(s => codigosPermitidos.includes(s.code))
+      .map(s => s.name);
+  }
+
+  // 🔓 Para 2025 e 2026: remover séries específicas de 2024
+  const codigos2024 = ['MT1', 'MT2', 'PE1', 'PE2', '1A1'];
+  return todasSeries
+    .filter(s => !codigos2024.includes(s.code))
+    .map(s => s.name);
+}, [formData['Unidade:'], formData['Ano de interesse da matrícula:'], tipoPBE, escola]);
+
 
   const podeSelecionarAnoEscolar = useMemo(() => {
     return !!formData['Ano de interesse da matrícula:'];
@@ -1192,6 +1222,8 @@ export default function HomePage() {
     ) {
       return false;
     }
+
+
 
     return campo.tipos[tipoPBE];
   });
@@ -1499,9 +1531,7 @@ export default function HomePage() {
 
         }
       }
-    } else {
-      toast.warn('Preencha todos os campos obrigatórios');
-    }
+    } 
   };
 
   const handlePrevious = () => {
