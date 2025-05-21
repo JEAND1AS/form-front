@@ -169,7 +169,7 @@ const camposFormulario: CampoFormulario[][] = [
       placeholder: 'DD/MM/AAAA'
     },
     {
-      nome: 'Naturalidade do(a) estudante:', tipos: {
+      nome: 'CEP:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -177,7 +177,8 @@ const camposFormulario: CampoFormulario[][] = [
         bancocarioca: true
       },
       tipoInput: 'text',
-      obrigatorio: true
+      obrigatorio: true,
+      placeholder: '_____-___'
     },
     {
       nome: 'NIS:', tipos: {
@@ -191,18 +192,6 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true
     },
     {
-      nome: 'CEP:', tipos: {
-        convenio: true,
-        sac: true,
-        merito: true,
-        cadunico: true,
-        bancocarioca: true
-      },
-      tipoInput: 'text',
-      obrigatorio: true,
-      placeholder: '_____-___'
-    },
-    {
       nome: 'Logradouro:', tipos: {
         convenio: true,
         sac: true,
@@ -212,17 +201,6 @@ const camposFormulario: CampoFormulario[][] = [
       },
       tipoInput: 'text',
       obrigatorio: true
-    },
-    {
-      nome: 'Número:', tipos: {
-        convenio: true,
-        sac: true,
-        merito: true,
-        cadunico: true,
-        bancocarioca: true
-      },
-      tipoInput: 'number',
-      obrigatorio: false
     },
     {
       nome: 'Bairro:', tipos: {
@@ -259,6 +237,29 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true
     },
     {
+      nome: 'Número:', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'number',
+      obrigatorio: false
+    },
+    {
+      nome: 'Naturalidade do(a) estudante:', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'text',
+      obrigatorio: true
+    },
+
+    {
       nome: 'Endereço:', tipos: {
         convenio: false,
         sac: false,
@@ -293,7 +294,7 @@ const camposFormulario: CampoFormulario[][] = [
         cadunico: true,
         bancocarioca: true
       },
-      obrigatorio: true,
+      obrigatorio: false,
       tipoInput: 'dropdown',
       opcoesDropdown: [
         'Sim',
@@ -302,7 +303,7 @@ const camposFormulario: CampoFormulario[][] = [
     },
 
     {
-      nome: 'Nome - Responsável 1', tipos: {
+      nome: 'Nome - Responsável 1:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -312,7 +313,7 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true
     },
     {
-      nome: 'Profissão - Responsável 1', tipos: {
+      nome: 'Profissão - Responsável 1:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -322,7 +323,7 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true
     },
     {
-      nome: 'CPF - Responsável 1', tipos: {
+      nome: 'CPF - Responsável 1:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -333,7 +334,7 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true
     },
     {
-      nome: 'Renda presumida em n° de Salários Mínimos - Responsável 1', tipos: {
+      nome: 'Renda presumida em n° de Salários Mínimos - Responsável 1:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -469,7 +470,7 @@ const camposFormulario: CampoFormulario[][] = [
         cadunico: true,
         bancocarioca: true
       },
-      obrigatorio: true,
+      obrigatorio: false,
       tipoInput: 'dropdown',
       opcoesDropdown: [
         'Sim',
@@ -986,10 +987,10 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
     },
     filiacao1: {
       TX_Tipo_Responsavel: 'FILIACAO1',
-      NM_Responsavel: limparTexto(dados['Nome - Responsável 1']),
-      NM_Profissao: limparTexto(dados['Profissão - Responsável 1']),
-      CD_CPF: limparTexto(dados['CPF - Responsável 1']),
-      TX_Renda: limparTexto(dados['Renda presumida em n° de Salários Mínimos - Responsável 1']),
+      NM_Responsavel: limparTexto(dados['Nome - Responsável 1:']),
+      NM_Profissao: limparTexto(dados['Profissão - Responsável 1:']),
+      CD_CPF: limparTexto(dados['CPF - Responsável 1:']),
+      TX_Renda: limparTexto(dados['Renda presumida em n° de Salários Mínimos - Responsável 1:']),
       TX_Logradouro: limparTexto(dados['Logradouro - Responsável 1:']),
       TX_Endereco: `${dados['Endereço - Responsável 1:']}${dados['Complemento - Responsável 1:'] ? ' - complemento: ' + dados['Complemento - Responsável 1:'] : ''}`.trim() || null,
       NR_Endereco: limparTexto(dados['Número - Responsável 1:']) || null,
@@ -1434,7 +1435,8 @@ export default function HomePage() {
       if (campo.nome === 'Data de nascimento:' && valor) {
         const idade = calcularIdade(valor);
         if (idade < 1) {
-          newErrors[campo.nome] = 'A idade deve estar entre 1 e 20 anos.';
+          newErrors[campo.nome] = 'Insira uma idade válida';
+          toast.error('Digite uma data válida')
         }
       }
 
@@ -1452,6 +1454,7 @@ export default function HomePage() {
         const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!regexEmail.test(valor)) {
           newErrors[campo.nome] = 'Digite um e-mail válido.';
+          toast.error('Digite um email válido')
         }
       }
     });
@@ -1509,8 +1512,8 @@ export default function HomePage() {
 
   const stepsDinamicos = useMemo(() => {
     const etapas = [
-      { nome: 'Cadastrando estudante', indice: 0 },
-      { nome: 'Filiação', indice: 1 },
+      { nome: 'Dados do(a) estudante', indice: 0 },
+      { nome: 'Dados dos(as) responsáveis', indice: 1 },
       { nome: 'Responsável financeiro', indice: 2 },
       { nome: 'Informações adicionais', indice: 3 }
     ];
