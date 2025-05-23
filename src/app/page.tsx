@@ -336,7 +336,8 @@ const camposFormulario: CampoFormulario[][] = [
         bancocarioca: true
       },
       tipoInput: 'text',
-      obrigatorio: true
+      obrigatorio: true,
+      placeholder: '___.___.___-__'
     },
     {
       nome: 'Renda presumida em n° de Salários Mínimos - Responsável 1:', tipos: {
@@ -512,7 +513,8 @@ const camposFormulario: CampoFormulario[][] = [
         bancocarioca: true
       },
       tipoInput: 'text',
-      obrigatorio: false
+      obrigatorio: false,
+      placeholder: '___.___.___-__'
     },
     {
       nome: 'Renda presumida em n° de Salários Mínimos - Responsável 2:', tipos: {
@@ -694,7 +696,8 @@ const camposFormulario: CampoFormulario[][] = [
         bancocarioca: true
       },
       tipoInput: 'text',
-      obrigatorio: true
+      obrigatorio: true,
+      placeholder: '___.___.___-__'
     },
     {
       nome: 'Renda presumida em n° de Salários Mínimos - Responsável financeiro:', tipos: {
@@ -1038,7 +1041,7 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
       NM_Profissao: limparTexto(dados['Profissão - Responsável financeiro:']),
       CD_CPF: limparTexto(dados['CPF - Responsável financeiro:']),
       TX_Renda: limparTexto(dados['Renda presumida em n° de Salários Mínimos - Responsável financeiro:']),
-      TX_Endereco: `${dados['Endereço - Responsável financeiro:']}${dados['Complemento - Responsável financeiro:'] ? ' - complemento: ' + dados['Complemento - Responsável financeiro:'] : ''}`.trim() || '',
+      TX_Endereco: `${dados['Endereço - Responsável financeiro:']}${dados['Complemento - Responsável financeiro:'] ? ' - complemento: ' + dados['Complemento - Responsável financeiro:'] : ''}`.trim() || null,
       TX_Logradouro: limparTexto(dados['Logradouro - Responsável financeiro:']),
       NR_Endereco: limparTexto(dados['Número - Responsável financeiro:']),
       TX_Complemento: limparTexto(dados['Complemento - Responsável financeiro:']) || null,
@@ -1443,6 +1446,10 @@ export default function HomePage() {
           camposOrigem.forEach(({ origem, destino }) => {
             novoFormData[destino] = prev[origem] || '';
           });
+
+          // Atualize o campo concatenado após copiar os dados
+          novoFormData['Endereço - Responsável financeiro:'] =
+            `${prev[`Logradouro - ${prefixo}:`] || ''}, ${prev[`Número - ${prefixo}:`] || ''}, ${prev[`Bairro - ${prefixo}:`] || ''}, ${prev[`Cidade - ${prefixo}:`] || ''}, ${prev[`Estado - ${prefixo}:`] || ''} - ${prev[`CEP - ${prefixo}:`] || ''}`.replace(/(, )+/g, ', ').replace(/^, |, $/g, '').replace(/, ,/g, ',');
         }
       }
 
@@ -1547,7 +1554,7 @@ export default function HomePage() {
         }
       }
 
-      if (campo.nome.includes('Nome completo') && valor && !validarNome(valor)) {
+      if (campo.nome.includes('Nome completo -') && valor && !validarNome(valor)) {
         newErrors[campo.nome] = 'O nome deve conter apenas letras e espaços.';
       }
 
