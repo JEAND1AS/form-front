@@ -123,6 +123,7 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'number',
       obrigatorio: true
     },
+
     {
       nome: 'Unidade:', tipos: {
         convenio: true,
@@ -134,6 +135,7 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'dropdown',
       obrigatorio: true,
     },
+
     {
       nome: 'Ano escolar de interesse do(a) estudante:', tipos: {
         convenio: true,
@@ -250,6 +252,17 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: false
     },
     {
+      nome: 'Complemento:', tipos: {
+        convenio: true,
+        sac: true,
+        merito: true,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'text',
+      obrigatorio: false
+    },
+    {
       nome: 'Naturalidade do(a) estudante:', tipos: {
         convenio: true,
         sac: true,
@@ -272,17 +285,7 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-    {
-      nome: 'Complemento:', tipos: {
-        convenio: true,
-        sac: true,
-        merito: true,
-        cadunico: true,
-        bancocarioca: true
-      },
-      tipoInput: 'text',
-      obrigatorio: false
-    },
+
 
   ],
 
@@ -305,7 +308,7 @@ const camposFormulario: CampoFormulario[][] = [
     },
 
     {
-      nome: 'Nome - Responsável 1:', tipos: {
+      nome: 'Nome completo - Responsável 1:', tipos: {
         convenio: true,
         sac: true,
         merito: true,
@@ -704,9 +707,9 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'dropdown',
       obrigatorio: true,
       opcoesDropdown: [
-        '1SM',
-        '2SM',
-        '3ouMaisSM'],
+        '1 S/M',
+        '2 S/M',
+        '3 OU MAIS S/M'],
     },
     {
       nome: 'CEP - Responsável financeiro:', tipos: {
@@ -853,6 +856,27 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true
     },
     {
+      nome: 'Relação de pessoas que residem no mesmo endereço (Nome/Grau de parentesco/Idade): ', tipos: {
+        convenio: false,
+        sac: true,
+        merito: false,
+        cadunico: true,
+        bancocarioca: true
+      },
+      tipoInput: 'text',
+      obrigatorio: true
+    },
+    {
+      nome: 'Relacione as despesas da família:', tipos: {
+        convenio: false,
+        sac: true,
+        merito: false,
+        cadunico: true,
+        bancocarioca: true
+      },
+      obrigatorio: true
+    },
+    {
       nome: 'Já solicitou bolsa de estudos?', tipos: {
         convenio: false,
         sac: true,
@@ -906,27 +930,6 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: false
     },
     {
-      nome: 'Relação de pessoas que residem no mesmo endereço (Nome/Grau de parentesco/Idade): ', tipos: {
-        convenio: false,
-        sac: true,
-        merito: false,
-        cadunico: true,
-        bancocarioca: true
-      },
-      tipoInput: 'text',
-      obrigatorio: true
-    },
-    {
-      nome: 'Relacione as despesas da família:', tipos: {
-        convenio: false,
-        sac: true,
-        merito: false,
-        cadunico: true,
-        bancocarioca: true
-      },
-      obrigatorio: true
-    },
-    {
       nome: 'Observações Gerais', tipos: {
         convenio: false,
         sac: false,
@@ -942,10 +945,10 @@ const camposFormulario: CampoFormulario[][] = [
 export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: TipoBolsa, escola: Escola) => {
   const CD_Coligada = escola === 'cel' ? 1 : 5;
   const filiacao2Preenchido = [
-    'Nome completo - Responsável 2',
-    'Profissão - Responsável 2',
-    'CPF - Responsável 2',
-    'Renda presumida em n° de Salários Mínimos - Responsável 2',
+    'Nome completo - Responsável 2:',
+    'Profissão - Responsável 2:',
+    'CPF - Responsável 2:',
+    'Renda presumida em n° de Salários Mínimos - Responsável 2:',
     'Endereço - Responsável 2:',
     'Logradouro - Responsável 2:',
     'Número - Responsável 2:',
@@ -956,6 +959,10 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
     'Estado - Responsável 2:',
     'Telefone - Responsável 2:',
   ].some(campo => dados[campo]?.trim());
+
+  const SG_Filial = escola === 'franco'
+    ? 'FB'
+    : (filiais.find(f => f.name === dados['Unidade:'])?.code || 'NA');
 
   const limparTexto = (texto: string | undefined | null): string => {
     if (!texto) return '';
@@ -973,7 +980,7 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
       NM_Naturalidade: limparTexto(dados['Naturalidade do(a) estudante:']),
       TX_Tipo_PBE: tipoPBE,
       CD_NIS: limparTexto(dados['NIS:']) || null,
-      CD_Matricula: limparTexto(dados['Está matriculado no CEL Intercultural School?:']) || null,
+      CD_Matricula: limparTexto(dados['Matrícula:']),
       CD_Coligada,
       CD_Ano_Escolar: limparTexto(dados['Ano escolar de interesse do(a) estudante:']),
       TX_Logradouro: limparTexto(dados['Logradouro:']),
@@ -983,13 +990,14 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
       TX_Complemento: limparTexto(dados['Complemento:']) || null,
       NR_Endereco: limparTexto(dados['Número:']) || '',
       CD_CEP: limparTexto(dados['CEP:']) || '',
-      NM_Unidade: dados['Unidade:'] || null,
-      IN_Aluno: dados['Está matriculado no CEL Intercultural School?'] || '',
+      NM_Unidade: dados['Unidade:'] || 'Colégio Franco',
+      IN_Aluno: dados['Está matriculado no CEL Intercultural School?'] || limparTexto(dados['Está matriculado no colégio franco?']) || null,
       TX_Endereco: `${dados['Endereço:'] || ''}${dados['Complemento:'] ? ' - complemento: ' + dados['Complemento:'] : ''}`.trim() || '',
+      SG_Filial: SG_Filial,
     },
     filiacao1: {
       TX_Tipo_Responsavel: 'FILIACAO1',
-      NM_Responsavel: limparTexto(dados['Nome - Responsável 1:']),
+      NM_Responsavel: limparTexto(dados['Nome completo - Responsável 1:']),
       NM_Profissao: limparTexto(dados['Profissão - Responsável 1:']),
       CD_CPF: limparTexto(dados['CPF - Responsável 1:']),
       TX_Renda: limparTexto(dados['Renda presumida em n° de Salários Mínimos - Responsável 1:']),
@@ -1062,8 +1070,8 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
 function normalizarParametro(param: string | null): string | null {
   if (!param) return null;
   return param
-    .normalize('NFD') // separa acentos das letras
-    .replace(/[\u0300-\u036f]/g, '') // remove acentos
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
 }
@@ -1102,7 +1110,7 @@ export default function HomePage() {
     );
   }
 
- 
+
 
 
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
@@ -1114,20 +1122,14 @@ export default function HomePage() {
   ).length;
 
   const opcoesAnoInteresse = useMemo(() => {
-  return tipoPBE === 'bancocarioca' ? ['2024'] : ['2024', '2025', '2026'];
-}, [tipoPBE]);
+    return tipoPBE === 'bancocarioca' ? ['2024'] : ['2024', '2025', '2026'];
+  }, [tipoPBE]);
 
- const opcoesUnidade = useMemo(() => {
-  const anoInteresse = formData['Ano de interesse da matrícula:'];
-
-  if (tipoPBE === 'bancocarioca') {
-    return ['Maria Angélica - Jardim Botânico'];
-  }
-
-  return filiais
-    .filter(f => (escola === 'franco' ? f.coligada === 5 : f.coligada === 1))
-    .map(f => f.name);
-}, [escola, tipoPBE, formData['Ano de interesse da matrícula:']]);
+  const opcoesUnidade = useMemo(() => {
+    return filiais
+      .filter(f => (escola === 'franco' ? f.coligada === 5 : f.coligada === 1))
+      .map(f => f.name);
+  }, [escola]);
 
   useEffect(() => {
     const ultimoTipo = localStorage.getItem('ultimoTipoPBE');
@@ -1153,44 +1155,83 @@ export default function HomePage() {
     }
   }, [tipoPBE, escola]);
 
+
+
   const opcoesAnoEscolar = useMemo(() => {
-  const anoInteresse = formData['Ano de interesse da matrícula:'];
-  const unidadeSelecionada = formData['Unidade:'];
-  const filial = filiais.find(f => f.name === unidadeSelecionada);
+    const anoInteresse = formData['Ano de interesse da matrícula:'];
+    const unidadeSelecionada = formData['Unidade:'];
+    const ehFranco = escola === 'franco';
 
-  if (!filial) return [];
+    const codigosDe2024 = ['MT1', 'MT2', 'PE1', 'PE2', '1A1'];
 
-  const todasSeries = filial.segmentos.flatMap(s => s.series);
+    if (ehFranco) {
+      const todasSeriesFranco = filiais
+        .filter(f => f.coligada === 5)
+        .flatMap(f => f.segmentos.flatMap(s => s.series));
 
-  // 🔒 Bancocarioca restrições
-  if (escola === 'cel' && tipoPBE === 'bancocarioca') {
-    if (anoInteresse !== '2024') return []; 
-    if (!filial.name.includes('Maria Angélica')) return [];
+      if (anoInteresse === '2024') {
+        return todasSeriesFranco
+          .filter(s => codigosDe2024.includes(s.code))
+          .map(s => s.name);
+      }
 
-    return todasSeries
-      .filter(s => ['1S2', '2S2', '3S2'].includes(s.code))
-      .map(s => s.name);
-  }
+      if (anoInteresse === '2025' || anoInteresse === '2026') {
+        return todasSeriesFranco
+          .filter(s => !codigosDe2024.includes(s.code))
+          .map(s => s.name);
+      }
 
-  // 🔒 Se ano de interesse for 2024, mostrar apenas séries específicas
-  if (anoInteresse === '2024') {
-    const codigosPermitidos = ['MT1', 'MT2', 'PE1', 'PE2', '1A1'];
-    return todasSeries
-      .filter(s => codigosPermitidos.includes(s.code))
-      .map(s => s.name);
-  }
+      return [];
+    }
 
-  // 🔓 Para 2025 e 2026: remover séries específicas de 2024
-  const codigos2024 = ['MT1', 'MT2', 'PE1', 'PE2', '1A1'];
-  return todasSeries
-    .filter(s => !codigos2024.includes(s.code))
-    .map(s => s.name);
-}, [formData['Unidade:'], formData['Ano de interesse da matrícula:'], tipoPBE, escola]);
+
+    const filial = filiais.find(f => f.name === unidadeSelecionada);
+    if (!filial) return [];
+
+    const todasSeries = filial.segmentos.flatMap(s => s.series);
+    const ehMariaAngelica = filial.name.includes('Maria Angélica');
+
+    if (tipoPBE === 'bancocarioca') {
+      if (!ehMariaAngelica) return [];
+      return todasSeries
+        .filter(s => ['1S2', '2S2', '3S2'].includes(s.code))
+        .map(s => s.name);
+    }
+
+    if (anoInteresse === '2024') {
+      if (ehMariaAngelica) {
+        return todasSeries.map(s => s.name);
+      }
+      return todasSeries
+        .filter(s => codigosDe2024.includes(s.code))
+        .map(s => s.name);
+    }
+
+    if (anoInteresse === '2025' || anoInteresse === '2026') {
+      return todasSeries
+        .filter(s => !codigosDe2024.includes(s.code))
+        .map(s => s.name);
+    }
+
+    return [];
+  }, [
+    formData['Ano de interesse da matrícula:'],
+    formData['Unidade:'],
+    tipoPBE,
+    escola
+  ]);
 
 
   const podeSelecionarAnoEscolar = useMemo(() => {
-    return !!formData['Ano de interesse da matrícula:'];
-  }, [formData['Ano de interesse da matrícula:']]);
+    if (escola === 'cel') {
+      return !!formData['Ano de interesse da matrícula:'] && !!formData['Unidade:'];
+    }
+    return true;
+  }, [
+    formData['Ano de interesse da matrícula:'],
+    formData['Unidade:'],
+    escola
+  ]);
 
 
   const camposVisiveis = camposFormulario[currentStep].filter(campo => {
@@ -1227,6 +1268,17 @@ export default function HomePage() {
 
     return campo.tipos[tipoPBE];
   });
+
+  const SG_Filial = useMemo(() => {
+  if (escola === 'franco') {
+    return 'FB';
+  }
+
+  const unidadeSelecionada = formData['Unidade:'];
+  const filialEncontrada = filiais.find(f => f.name === unidadeSelecionada);
+
+  return filialEncontrada?.code || '';
+}, [formData['Unidade:'], escola]);
 
   const calcularIdade = (dataNascimento: string) => {
     const hoje = new Date();
@@ -1350,30 +1402,48 @@ export default function HomePage() {
     setFormData(prev => {
       const novoFormData = { ...prev, [campo]: valorFormatado };
 
-      if (
-        campo === 'Deseja copiar os dados de algum responsável?' &&
-        (valor === 'Responsável 1' || valor === 'Responsável 2')
-      ) {
-        const prefixo = valor === 'Responsável 1' ? 'Responsável 1' : 'Responsável 2';
-        const camposOrigem = [
-          { origem: `Nome - ${prefixo}`, destino: 'Nome completo - Responsável financeiro:' },
-          { origem: `Profissão - ${prefixo}`, destino: 'Profissão - Responsável financeiro:' },
-          { origem: `CPF - ${prefixo}:`, destino: 'CPF - Responsável financeiro:' },
-          { origem: `Telefone - ${prefixo}:`, destino: 'Telefone - Responsável financeiro:' },
-          { origem: `Renda presumida em n° de Salários Mínimos - ${prefixo}`, destino: 'Renda presumida em n° de Salários Mínimos - Responsável financeiro:' },
-          { origem: `CEP - ${prefixo}:`, destino: 'CEP - Responsável financeiro:' },
-          { origem: `Logradouro - ${prefixo}:`, destino: 'Logradouro - Responsável financeiro:' },
-          { origem: `Bairro - ${prefixo}:`, destino: 'Bairro - Responsável financeiro:' },
-          { origem: `Cidade - ${prefixo}:`, destino: 'Cidade - Responsável financeiro:' },
-          { origem: `Estado - ${prefixo}:`, destino: 'Estado - Responsável financeiro:' },
-          { origem: `Número - ${prefixo}:`, destino: 'Número - Responsável financeiro:' },
-          { origem: `Complemento - ${prefixo}:`, destino: 'Complemento - Responsável financeiro:' },
-        ];
-        camposOrigem.forEach(({ origem, destino }) => {
-          if (prev[origem]) {
-            novoFormData[destino] = prev[origem];
-          }
+      if (campo === 'Deseja copiar os dados de algum responsável?') {
+        [
+          'Nome completo - Responsável financeiro:',
+          'Profissão - Responsável financeiro:',
+          'CPF - Responsável financeiro:',
+          'Telefone - Responsável financeiro:',
+          'Renda presumida em n° de Salários Mínimos - Responsável financeiro:',
+          'CEP - Responsável financeiro:',
+          'Logradouro - Responsável financeiro:',
+          'Bairro - Responsável financeiro:',
+          'Cidade - Responsável financeiro:',
+          'Estado - Responsável financeiro:',
+          'Número - Responsável financeiro:',
+          'Complemento - Responsável financeiro:',
+          'Endereço - Responsável financeiro:',
+          'E-mail - Responsável financeiro:'
+        ].forEach(campoFin => {
+          novoFormData[campoFin] = '';
         });
+
+        if (valor === 'Responsável 1' || valor === 'Responsável 2') {
+          const prefixo = valor === 'Responsável 1' ? 'Responsável 1' : 'Responsável 2';
+          const camposOrigem = [
+            { origem: `Nome ${prefixo.includes('1') ? 'completo - Responsável 1:' : 'completo - Responsável 2:'}`, destino: 'Nome completo - Responsável financeiro:' },
+            { origem: `Profissão - ${prefixo}:`, destino: 'Profissão - Responsável financeiro:' },
+            { origem: `CPF - ${prefixo}:`, destino: 'CPF - Responsável financeiro:' },
+            { origem: `Telefone - ${prefixo}:`, destino: 'Telefone - Responsável financeiro:' },
+            { origem: `Renda presumida em n° de Salários Mínimos - ${prefixo}:`, destino: 'Renda presumida em n° de Salários Mínimos - Responsável financeiro:' },
+            { origem: `CEP - ${prefixo}:`, destino: 'CEP - Responsável financeiro:' },
+            { origem: `Logradouro - ${prefixo}:`, destino: 'Logradouro - Responsável financeiro:' },
+            { origem: `Bairro - ${prefixo}:`, destino: 'Bairro - Responsável financeiro:' },
+            { origem: `Cidade - ${prefixo}:`, destino: 'Cidade - Responsável financeiro:' },
+            { origem: `Estado - ${prefixo}:`, destino: 'Estado - Responsável financeiro:' },
+            { origem: `Número - ${prefixo}:`, destino: 'Número - Responsável financeiro:' },
+            { origem: `Complemento - ${prefixo}:`, destino: 'Complemento - Responsável financeiro:' },
+            { origem: `E-mail - ${prefixo}:`, destino: 'E-mail - Responsável financeiro:' },
+          ];
+
+          camposOrigem.forEach(({ origem, destino }) => {
+            novoFormData[destino] = prev[origem] || '';
+          });
+        }
       }
 
       if (
@@ -1388,7 +1458,6 @@ export default function HomePage() {
         novoFormData['Estado - Responsável 1:'] = prev['Estado:'] || '';
         novoFormData['Número - Responsável 1:'] = prev['Número:'] || '';
         novoFormData['Complemento - Responsável 1:'] = prev['Complemento:'] || '';
-        // Atualiza o endereço concatenado
         novoFormData['Endereço - Responsável 1:'] =
           `${prev['Logradouro:'] || ''}, ${prev['Número:'] || ''}, ${prev['Bairro:'] || ''}, ${prev['Cidade:'] || ''}, ${prev['Estado:'] || ''} - ${prev['CEP:'] || ''}`.replace(/(, )+/g, ', ').replace(/^, |, $/g, '').replace(/, ,/g, ',');
       }
@@ -1530,8 +1599,17 @@ export default function HomePage() {
           toast.error(`Erro no envio do formulário!`);
 
         }
+
+        if (escola === 'cel' && !formData['Unidade:']) {
+          toast.error('Selecione a unidade');
+          return;
+        }
+        if (!formData['Ano de interesse da matrícula:']) {
+          toast.error('Selecione o ano de interesse');
+          return;
+        }
       }
-    } 
+    }
   };
 
   const handlePrevious = () => {
