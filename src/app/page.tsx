@@ -1165,55 +1165,83 @@ export default function HomePage() {
   const opcoesAnoEscolar = useMemo(() => {
     const anoInteresse = formData['Ano de interesse da matrícula:'];
     const unidadeSelecionada = formData['Unidade:'];
-    const ehFranco = escola === 'franco';
-
-    const codigosDe2024 = ['MT1', 'MT2', 'PE1', 'PE2', '1A1'];
 
 
-    if (ehFranco) {
-      const todasSeriesFranco = filiais
-        .filter(f => f.coligada === 5)
-        .flatMap(f => f.segmentos.flatMap(s => s.series));
 
+    if (!anoInteresse || (escola !== 'franco' && !formData['Unidade:'])) return [];
+
+    if (escola === 'franco') {
+  const SeriesFranco = filiais
+    .filter(f => f.coligada === 5)
+    .flatMap(f => f.segmentos.flatMap(s => s.series));
+  
+  if (anoInteresse === '2024') {
+    return SeriesFranco
+    .map(s => s.name.replace('2024', anoInteresse));
+  }
+
+  if (anoInteresse === '2025') {
+    return SeriesFranco
+      .map(s => s.name.replace('2024', anoInteresse));
+  }
+}
+
+    if (tipoPBE === 'bancocarioca') {
+      const seriesEnsinoMedio = filiais
+        .find(f => f.code === 'MA')
+        ?.segmentos.flatMap(s => s.series)
+        .filter(s => ['1S2', '2S2', '3S2'].includes(s.code)) || [];
       if (anoInteresse === '2024') {
-        return todasSeriesFranco
+        return seriesEnsinoMedio.map(s => s.name);
+      }
+      if(anoInteresse === '2025') {
+        return seriesEnsinoMedio
+          .filter(s => ['6A1', '7A1', '8A1', '9A1', '1S2', '2S2', '3S2'].includes(s.code))
           .map(s => s.name);
       }
-
-      if (anoInteresse === '2025') {
-        // Mostrar todas as séries, incluindo as de 2024, mas trocando "2024" no nome
-        const anoSubstituto = anoInteresse;
-
-        return todasSeriesFranco.map(s => {
-          // Troca "2024" no nome, se existir
-          const nomeAjustado = s.name.replace('2024', anoSubstituto);
-          return nomeAjustado;
-        });
-      }
-
-
       return [];
     }
 
 
+    
 
+
+
+
+
+
+
+    /* if (escola === 'franco') {
+      const unidades = filiais
+        .filter(f => f.coligada === 5)
+        .flatMap(f => f.segmentos.flatMap(s => s.series));
+
+      if (anoInteresse === '2024') {
+        return unidades
+          .map(s => s.name);
+      }
+
+      if (anoInteresse === '2025') {
+        return unidades.map(s => {
+          return s.name.replace('2024', anoInteresse);
+        });
+      }
+      return [];
+    }
 
     const filial = filiais.find(f => f.name === unidadeSelecionada);
     if (!filial) return [];
 
     const todasSeries = filial.segmentos.flatMap(s => s.series);
-    const ehMariaAngelica = filial.name.includes('Maria Angélica');
-    const codigosEnsinoMedio = ['1S2', '2S2', '3S2'];
-    const codigosFundamentalEM = ['6A1', '7A1', '8A1', '9A1', '1S2', '2S2', '3S2'];
+    const ehMariaAngelica = filial.name.includes('MA');
 
     if (tipoPBE === 'bancocarioca') {
-      const filial = filiais.find(f => f.name.includes('Maria Angélica'));
+      const filial = filiais.find(f => f.code === 'MA');
       if (!filial) return [];
 
       const todasSeries = filial.segmentos.flatMap(s => s.series);
 
       if (anoInteresse === '2024') {
-        // Só Ensino Médio
         return todasSeries
           .filter(s => ['1S2', '2S2', '3S2'].includes(s.code))
           .map(s => s.name);
@@ -1242,7 +1270,7 @@ export default function HomePage() {
       return todasSeries
         .filter(s => !codigosDe2024.includes(s.code))
         .map(s => s.name);
-    }
+    } */
 
     return [];
   }, [
