@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* 
@@ -111,7 +112,6 @@ const camposFormulario: CampoFormulario[][] = [
       opcoesDropdown: ['Sim', 'Não'],
       obrigatorio: true
     },
-
     {
       nome: 'Matrícula:', tipos: {
         convenio: true,
@@ -123,7 +123,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'number',
       obrigatorio: true
     },
-
     {
       nome: 'Unidade:', tipos: {
         convenio: true,
@@ -135,7 +134,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'dropdown',
       obrigatorio: true,
     },
-
     {
       nome: 'Ano escolar de interesse do(a) estudante:', tipos: {
         convenio: true,
@@ -284,8 +282,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-
-
   ],
 
   [
@@ -305,7 +301,6 @@ const camposFormulario: CampoFormulario[][] = [
         'Não'
       ],
     },
-
     {
       nome: 'Nome completo - Responsável 1:', tipos: {
         convenio: true,
@@ -466,7 +461,6 @@ const camposFormulario: CampoFormulario[][] = [
       obrigatorio: true,
       validacao: 'email'
     },
-
     {
       nome: 'Responsável 2 reside com o estudante?', tipos: {
         convenio: true,
@@ -482,7 +476,6 @@ const camposFormulario: CampoFormulario[][] = [
         'Não'
       ],
     },
-
     {
       nome: 'Nome completo - Responsável 2:', tipos: {
         convenio: true,
@@ -620,7 +613,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-
     {
       nome: 'Telefone - Responsável 2:', tipos: {
         convenio: true,
@@ -632,7 +624,6 @@ const camposFormulario: CampoFormulario[][] = [
       tipoInput: 'text',
       obrigatorio: false
     },
-
     {
       nome: 'E-mail - Responsável 2:', tipos: {
         convenio: true,
@@ -664,7 +655,6 @@ const camposFormulario: CampoFormulario[][] = [
       ],
       obrigatorio: false,
     },
-
     {
       nome: 'Nome completo - Responsável financeiro:', tipos: {
         convenio: true,
@@ -997,6 +987,7 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
       TX_Endereco: `${dados['Endereço:'] || ''}${dados['Complemento:'] ? ' - complemento: ' + dados['Complemento:'] : ''}`.trim() || '',
       SG_Filial: SG_Filial,
     },
+
     filiacao1: {
       TX_Tipo_Responsavel: 'FILIACAO1',
       NM_Responsavel: limparTexto(dados['Nome completo - Responsável 1:']),
@@ -1034,6 +1025,7 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
         TX_Email: limparTexto(dados['E-mail - Responsável 2:']) || null,
       }
       : null,
+
     responsavelFinanceiro: {
       TX_Tipo_Responsavel: 'RESPONSAVEL FINANCEIRO',
       NM_Responsavel: limparTexto(dados['Nome completo - Responsável financeiro:']),
@@ -1113,8 +1105,6 @@ export default function HomePage() {
   }
 
 
-
-
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [currentStep, setCurrentStep] = useState(0);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -1122,10 +1112,6 @@ export default function HomePage() {
   const totalEtapasVisiveis = camposFormulario.filter(etapa =>
     etapa.some(campo => campo.tipos[tipoPBE])
   ).length;
-
-  const opcoesAnoInteresse = useMemo(() => {
-    return tipoPBE === 'bancocarioca' ? ['2024'] : ['2024', '2025'];
-  }, [tipoPBE]);
 
   const opcoesUnidade = useMemo(() => {
     if (tipoPBE === 'bancocarioca') {
@@ -1169,27 +1155,27 @@ export default function HomePage() {
     const unidadeSelecionada = formData['Unidade:'];
 
 
-    if (!anoInteresse) return [];
-    if (escola !== 'franco' && !unidadeSelecionada) return [];
+    return !anoInteresse
+      ? []
+      : (escola !== 'franco' && !unidadeSelecionada)
+        ? []
+        : (
+          (
+            escola === 'franco'
+              ? filiais.filter(f => f.coligada === 5).flatMap(f => f.segmentos.flatMap(s => s.series))
+              : tipoPBE === 'bancocarioca'
+                ? filiais.find(f => f.code === 'MA')?.segmentos.flatMap(s => s.series) || []
+                : filiais.find(f => f.code === unidadeSelecionada)?.segmentos.flatMap(s => s.series) || []
+          )
+        )
+          .filter(s => (tipoPBE === 'bancocarioca' && anoInteresse === '2024') ? ['1S2', '2S2', '3S2'].includes(s.code) : true)
+          .map(s => ({
+            label: (escola === 'franco' || escola === 'cel')
+              ? (anoInteresse === '2024' ? s.name : s.name.replace('2024', anoInteresse))
+              : s.name,
+            value: s.code
+          }));
 
-    const unidades = escola === 'franco'
-      ? filiais.filter(f => f.coligada === 5).flatMap(f => f.segmentos.flatMap(s => s.series))
-      : tipoPBE === 'bancocarioca'
-        ? filiais.find(f => f.code === 'MA')?.segmentos.flatMap(s => s.series) || []
-        : filiais.find(f => f.code === unidadeSelecionada)
-          ?.segmentos.flatMap(s => s.series) || [];
-
-    return unidadeSelecionada || escola === 'franco'
-      ? unidades.map(s => ({
-        label: anoInteresse === '2024' ? s.name : s.name.replace('2024', anoInteresse),
-        value: s.code
-      }))
-      : tipoPBE === 'bancocarioca' && anoInteresse === '2024'
-        ? unidades
-          .filter(s => ['1S2', '2S2', '3S2'].includes(s.code))
-          .map(filial => ({ label: filial.name, value: filial.code }))
-        : unidades
-          .map(filial => ({ label: filial.name, value: filial.code }));
   }, [
     formData['Ano de interesse da matrícula:'],
     formData['Unidade:'],
@@ -1200,7 +1186,7 @@ export default function HomePage() {
 
 
 
-  const podeSelecionarAnoEscolar = useMemo(() => {
+  const selecionarAnoEscolar = useMemo(() => {
     if (escola === 'cel') {
       return !!formData['Ano de interesse da matrícula:'] && !!formData['Unidade:'];
     }
@@ -1247,27 +1233,17 @@ export default function HomePage() {
     return campo.tipos[tipoPBE];
   });
 
-  const SG_Filial = useMemo(() => {
-    if (escola === 'franco') {
-      return 'FB';
-    }
+  /*   const SG_Filial = useMemo(() => {
+      if (escola === 'franco') {
+        return 'FB';
+      }
+  
+      const unidadeSelecionada = formData['Unidade:'];
+      const filialEncontrada = filiais.find(f => f.name === unidadeSelecionada);
+  
+      return filialEncontrada?.code || '';
+    }, [formData['Unidade:'], escola]); */
 
-    const unidadeSelecionada = formData['Unidade:'];
-    const filialEncontrada = filiais.find(f => f.name === unidadeSelecionada);
-
-    return filialEncontrada?.code || '';
-  }, [formData['Unidade:'], escola]);
-
-  const calcularIdade = (dataNascimento: string) => {
-    const hoje = new Date();
-    const nascimento = new Date(dataNascimento);
-    let idade = hoje.getFullYear() - nascimento.getFullYear();
-    const mes = hoje.getMonth() - nascimento.getMonth();
-    if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
-      idade--;
-    }
-    return idade;
-  };
 
 
   const validarCPF = (cpf: string) => {
@@ -1363,18 +1339,19 @@ export default function HomePage() {
   const handleChange = (campo: string, valor: string) => {
     let valorFormatado = valor;
 
-    if (campo.includes('CEP')) {
-      valorFormatado = valor.replace(/\D/g, '').replace(/(\d{5})(\d{1,3})/, '$1-$2').slice(0, 9);
-      buscarEndereco(valorFormatado, campo);
-    }
+    (campo.includes('CEP')) && (
+      valorFormatado = valor.replace(/\D/g, '').replace(/(\d{5})(\d{1,3})/, '$1-$2').slice(0, 9),
+      buscarEndereco(valorFormatado, campo)
+    );
 
-    if (campo.includes('Telefone')) {
-      valorFormatado = formatarTelefone(valor);
-    }
+    (campo.includes('Telefone')) && (
+      valorFormatado = formatarTelefone(valor)
+    );
 
-    if (campo.includes('CPF')) {
-      valorFormatado = formatarCPF(valor);
-    }
+    (campo.includes('CPF')) && (
+      valorFormatado = formatarCPF(valor)
+    );
+
 
 
     setFormData(prev => {
@@ -1556,25 +1533,36 @@ export default function HomePage() {
     camposVisiveis.forEach(campo => {
       const valor = formData[campo.nome]?.toString().trim();
 
-      if (campo.obrigatorio && !valor) {
-        newErrors[campo.nome] = 'Este campo é obrigatório.';
-      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      (campo.obrigatorio && !valor) && (
+        newErrors[campo.nome] = 'Este campo é obrigatório.',
+        toast.warning('Preencha o campoos campos obrigatórios')
+      )
 
       if (campo.nome === 'Data de nascimento:' && valor) {
 
-        const hoje = new Date();
+        const dataAtual = new Date();
         const nascimento = new Date(valor);
         const dataMinima = new Date();
         dataMinima.setMonth(dataMinima.getMonth() - 3);
 
-        if (nascimento > hoje) {
-          newErrors[campo.nome] = 'Insira uma idade válida.';
-          toast.error('Digite uma data válida')
-        } else if (nascimento > dataMinima) {
-          newErrors[campo.nome] = 'Digite uma data válida.';
-          toast.error('Digite uma data válida')
-        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        (nascimento > dataAtual)
+          && (
+            newErrors[campo.nome] = 'Insira uma idade válida.',
+            toast.error('Digite uma data válida')
+          );
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        (nascimento <= dataAtual && nascimento > dataMinima)
+          && (
+            newErrors[campo.nome] = 'Digite uma data válida.',
+            toast.error('Digite uma data válida')
+          );
+
+
       }
+
 
       if (campo.nome.includes('CPF') && valor) {
         if (!validarCPF(valor)) {
@@ -1715,9 +1703,9 @@ export default function HomePage() {
                     {campo.tipoInput === 'dropdown' ? (
                       <div className="relative w-full">
                         <select
-                          disabled={campo.nome === 'Ano escolar de interesse do(a) estudante:' && !podeSelecionarAnoEscolar}
+                          disabled={campo.nome === 'Ano escolar de interesse do(a) estudante:' && !selecionarAnoEscolar}
                           className={`w-full border rounded-lg px-4 py-2 pr-10 focus:outline-none shadow-sm
-        ${!podeSelecionarAnoEscolar && campo.nome === 'Ano escolar de interesse do(a) estudante:'
+        ${!selecionarAnoEscolar && campo.nome === 'Ano escolar de interesse do(a) estudante:'
                               ? 'bg-gray-100 cursor-not-allowed text-gray-500 border-gray-300'
                               : 'border-gray-300 focus:ring-2 focus:ring-blue-500'}
         ${errors[campo.nome] ? 'border-red-700' : ''}
@@ -1747,7 +1735,7 @@ export default function HomePage() {
                           })}
                         </select>
 
-                        {campo.nome === 'Ano escolar de interesse do(a) estudante:' && !podeSelecionarAnoEscolar && (
+                        {campo.nome === 'Ano escolar de interesse do(a) estudante:' && !selecionarAnoEscolar && (
                           <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                           </div>
                         )}
