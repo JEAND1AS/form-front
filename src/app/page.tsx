@@ -475,7 +475,7 @@ const camposFormulario: CampoFormulario[][] = [
         cadunico: true,
         bancocarioca: true
       },
-      obrigatorio: true,
+      obrigatorio: false,
       tipoInput: 'dropdown',
       opcoesDropdown: [
         'Sim',
@@ -992,7 +992,7 @@ export const mapearCampos = async (dados: { [key: string]: string }, tipoPBE: Ti
       TX_Complemento: limparTexto(dados['Complemento:']) || null,
       NR_Endereco: limparTexto(dados['Número:']) || '',
       CD_CEP: limparTexto(dados['CEP:']) || '',
-      NM_Unidade: dados['Unidade:'] || 'Colégio Franco',
+      NM_Unidade: dados['Unidade:'] || 'LFB',
       IN_Aluno: dados['Está matriculado no CEL Intercultural School?'] || limparTexto(dados['Está matriculado no colégio franco?']) || null,
       TX_Endereco: `${dados['Endereço:'] || ''}${dados['Complemento:'] ? ' - complemento: ' + dados['Complemento:'] : ''}`.trim() || '',
       SG_Filial: SG_Filial,
@@ -1129,11 +1129,13 @@ export default function HomePage() {
 
   const opcoesUnidade = useMemo(() => {
     if (tipoPBE === 'bancocarioca') {
-      return filiais.filter(f => f.name.includes('Maria Angélica')).map(f => f.name);
+      return filiais.filter(f => f.name.includes('Maria Angélica')).map(f => ({ label: f.name, value: f.code }));
     }
     return filiais
       .filter(f => (escola === 'franco' ? f.coligada === 5 : f.coligada === 1))
-      .map(f => f.name);
+      .map(f => ({ label: f.name, value: f.code }));
+
+
   }, [escola]);
 
   useEffect(() => {
@@ -1167,118 +1169,34 @@ export default function HomePage() {
     const unidadeSelecionada = formData['Unidade:'];
 
 
+    if (!anoInteresse) return [];
+    if (escola !== 'franco' && !unidadeSelecionada) return [];
 
-    if (!anoInteresse || (escola !== 'franco' && !formData['Unidade:'])) return [];
+    const unidades = escola === 'franco'
+      ? filiais.filter(f => f.coligada === 5).flatMap(f => f.segmentos.flatMap(s => s.series))
+      : tipoPBE === 'bancocarioca'
+        ? filiais.find(f => f.code === 'MA')?.segmentos.flatMap(s => s.series) || []
+        : filiais.find(f => f.code === unidadeSelecionada)
+          ?.segmentos.flatMap(s => s.series) || [];
 
-    if (escola === 'franco') {
-  const SeriesFranco = filiais
-    .filter(f => f.coligada === 5)
-    .flatMap(f => f.segmentos.flatMap(s => s.series));
-  
-  if (anoInteresse === '2024') {
-    return SeriesFranco
-    .map(s => s.name.replace('2024', anoInteresse));
-  }
-
-  if (anoInteresse === '2025') {
-    return SeriesFranco
-      .map(s => s.name.replace('2024', anoInteresse));
-  }
-}
-
-    if (tipoPBE === 'bancocarioca') {
-      const seriesEnsinoMedio = filiais
-        .find(f => f.code === 'MA')
-        ?.segmentos.flatMap(s => s.series)
-        .filter(s => ['1S2', '2S2', '3S2'].includes(s.code)) || [];
-      if (anoInteresse === '2024') {
-        return seriesEnsinoMedio.map(s => s.name);
-      }
-      if(anoInteresse === '2025') {
-        return seriesEnsinoMedio
-          .filter(s => ['6A1', '7A1', '8A1', '9A1', '1S2', '2S2', '3S2'].includes(s.code))
-          .map(s => s.name);
-      }
-      return [];
-    }
-
-
-    
-
-
-
-
-
-
-
-    /* if (escola === 'franco') {
-      const unidades = filiais
-        .filter(f => f.coligada === 5)
-        .flatMap(f => f.segmentos.flatMap(s => s.series));
-
-      if (anoInteresse === '2024') {
-        return unidades
-          .map(s => s.name);
-      }
-
-      if (anoInteresse === '2025') {
-        return unidades.map(s => {
-          return s.name.replace('2024', anoInteresse);
-        });
-      }
-      return [];
-    }
-
-    const filial = filiais.find(f => f.name === unidadeSelecionada);
-    if (!filial) return [];
-
-    const todasSeries = filial.segmentos.flatMap(s => s.series);
-    const ehMariaAngelica = filial.name.includes('MA');
-
-    if (tipoPBE === 'bancocarioca') {
-      const filial = filiais.find(f => f.code === 'MA');
-      if (!filial) return [];
-
-      const todasSeries = filial.segmentos.flatMap(s => s.series);
-
-      if (anoInteresse === '2024') {
-        return todasSeries
+    return unidadeSelecionada || escola === 'franco'
+      ? unidades.map(s => ({
+        label: anoInteresse === '2024' ? s.name : s.name.replace('2024', anoInteresse),
+        value: s.code
+      }))
+      : tipoPBE === 'bancocarioca' && anoInteresse === '2024'
+        ? unidades
           .filter(s => ['1S2', '2S2', '3S2'].includes(s.code))
-          .map(s => s.name);
-      }
-
-      if (anoInteresse === '2025') {
-        const codigosPermitidos = ['6A1', '7A1', '8A1', '9A1', '1S2', '2S2', '3S2'];
-        return todasSeries
-          .filter(s => codigosPermitidos.includes(s.code))
-          .map(s => s.name);
-      }
-
-      return [];
-    }
-
-    if (anoInteresse === '2024') {
-      if (ehMariaAngelica) {
-        return todasSeries.map(s => s.name);
-      }
-      return todasSeries
-        .filter(s => codigosDe2024.includes(s.code))
-        .map(s => s.name);
-    }
-
-    if (anoInteresse === '2025' || anoInteresse === '2026') {
-      return todasSeries
-        .filter(s => !codigosDe2024.includes(s.code))
-        .map(s => s.name);
-    } */
-
-    return [];
+          .map(filial => ({ label: filial.name, value: filial.code }))
+        : unidades
+          .map(filial => ({ label: filial.name, value: filial.code }));
   }, [
     formData['Ano de interesse da matrícula:'],
     formData['Unidade:'],
     tipoPBE,
     escola
   ]);
+
 
 
 
@@ -1810,16 +1728,23 @@ export default function HomePage() {
                           <option value="" disabled>
                             {campo.placeholder || 'Selecione uma opção'}
                           </option>
-                          {(campo.nome === 'Ano escolar de interesse do(a) estudante:'
-                            ? opcoesAnoEscolar
-                            : campo.nome === 'Unidade:'
-                              ? opcoesUnidade
-                              : campo.opcoesDropdown
-                          )?.map((opcao, idx) => (
-                            <option key={idx} value={opcao}>
-                              {opcao}
-                            </option>
-                          ))}
+
+                          {(
+                            campo.nome === 'Ano escolar de interesse do(a) estudante:'
+                              ? opcoesAnoEscolar
+                              : campo.nome === 'Unidade:'
+                                ? opcoesUnidade
+                                : campo.opcoesDropdown
+                          )?.map((opcao, idx) => {
+                            const label = typeof opcao === 'string' ? opcao : opcao.label;
+                            const value = typeof opcao === 'string' ? opcao : opcao.value;
+
+                            return (
+                              <option key={value} value={value}>
+                                {label}
+                              </option>
+                            );
+                          })}
                         </select>
 
                         {campo.nome === 'Ano escolar de interesse do(a) estudante:' && !podeSelecionarAnoEscolar && (

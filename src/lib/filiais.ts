@@ -8,7 +8,7 @@ export const filiais = [
         name: 'Ensino Fundamental - Anos Finais',
         code: 'EFII',
         series: [
-          { name: '6º ano do Ensino Fundamental', code: '6A1' },
+          { name: '6º ano do Ensino Fundamental', code: '6A1'},
           { name: '7º ano do Ensino Fundamental', code: '7A1' },
           { name: '8º ano do Ensino Fundamental', code: '8A1' },
           { name: '9º ano do Ensino Fundamental', code: '9A1' },
