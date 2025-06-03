@@ -27,6 +27,7 @@ import BarraProgresso from '@/components/ui/BarraProgresso';
 import { Bounce, ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { filiais } from '@/lib/filiais';
+import { error } from 'console';
 
 
 
@@ -112,6 +113,7 @@ const camposFormulario: CampoFormulario[][] = [
       opcoesDropdown: ['Sim', 'Não'],
       obrigatorio: true
     },
+
     {
       nome: 'Matrícula:', tipos: {
         convenio: true,
@@ -1155,26 +1157,25 @@ export default function HomePage() {
     const unidadeSelecionada = formData['Unidade:'];
 
 
+   
+
     return !anoInteresse
       ? []
       : (escola !== 'franco' && !unidadeSelecionada)
         ? []
-        : (
-          (
+        :(
             escola === 'franco'
               ? filiais.filter(f => f.coligada === 5).flatMap(f => f.segmentos.flatMap(s => s.series))
               : tipoPBE === 'bancocarioca'
                 ? filiais.find(f => f.code === 'MA')?.segmentos.flatMap(s => s.series) || []
                 : filiais.find(f => f.code === unidadeSelecionada)?.segmentos.flatMap(s => s.series) || []
           )
-        )
           .filter(s => (tipoPBE === 'bancocarioca' && anoInteresse === '2024') ? ['1S2', '2S2', '3S2'].includes(s.code) : true)
-          .map(s => ({
-            label: (escola === 'franco' || escola === 'cel')
+          .map(s => 
+          (unidadeSelecionada || !unidadeSelecionada)
               ? (anoInteresse === '2024' ? s.name : s.name.replace('2024', anoInteresse))
               : s.name,
-            value: s.code
-          }));
+          );
 
   }, [
     formData['Ano de interesse da matrícula:'],
@@ -1232,18 +1233,6 @@ export default function HomePage() {
 
     return campo.tipos[tipoPBE];
   });
-
-  /*   const SG_Filial = useMemo(() => {
-      if (escola === 'franco') {
-        return 'FB';
-      }
-  
-      const unidadeSelecionada = formData['Unidade:'];
-      const filialEncontrada = filiais.find(f => f.name === unidadeSelecionada);
-  
-      return filialEncontrada?.code || '';
-    }, [formData['Unidade:'], escola]); */
-
 
 
   const validarCPF = (cpf: string) => {
@@ -1336,8 +1325,17 @@ export default function HomePage() {
   };
 
 
+
+
   const handleChange = (campo: string, valor: string) => {
     let valorFormatado = valor;
+
+
+    if (campo.includes('Data de nascimento:') && valor > new Date().toISOString().slice(0, 10)){
+      errors[campo] = 'Data de nascimento não pode ser futura';
+      setErrors({ ...errors });
+      return;
+    }
 
     (campo.includes('CEP')) && (
       valorFormatado = valor.replace(/\D/g, '').replace(/(\d{5})(\d{1,3})/, '$1-$2').slice(0, 9),
@@ -1351,6 +1349,8 @@ export default function HomePage() {
     (campo.includes('CPF')) && (
       valorFormatado = formatarCPF(valor)
     );
+
+    
 
 
 
@@ -1524,6 +1524,7 @@ export default function HomePage() {
       return novoFormData;
     });
 
+
     setErrors(prev => ({ ...prev, [campo]: '' }));
   };
 
@@ -1535,8 +1536,7 @@ export default function HomePage() {
 
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       (campo.obrigatorio && !valor) && (
-        newErrors[campo.nome] = 'Este campo é obrigatório.',
-        toast.warning('Preencha o campoos campos obrigatórios')
+        newErrors[campo.nome] = 'Este campo é obrigatório.'
       )
 
       if (campo.nome === 'Data de nascimento:' && valor) {
@@ -1615,10 +1615,7 @@ export default function HomePage() {
 
         } catch (error: unknown) {
           console.error('Erro no envio:', error);
-          const errorMessage =
-            error instanceof Error
-              ? error.message
-              : 'Verifique o log de erro';
+          setFormSubmitted(false);
           toast.error(`Erro no envio do formulário!`);
 
         }
@@ -1742,13 +1739,15 @@ export default function HomePage() {
                       </div>
                     ) : (
                       <input
-                        type={campo.tipoInput || 'text'}
+                        type={campo.tipoInput || 'text'
+
+                        }
                         className={`w-full border ${errors[campo.nome] ? 'border-red-700' : 'border-gray-300'} rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm`}
                         value={formData[campo.nome] || ''}
                         onChange={(e) => handleChange(campo.nome, e.target.value)}
                         placeholder={campo.placeholder || ''}
-                        {...(campo.tipoInput === 'date' ? { max: new Date().toISOString().slice(0, 10) } : {})}
-
+                        {... (campo.tipoInput === 'date' ? { max: new Date().toISOString().slice(0, 10) } : {})}
+                        
                       />
                     )}
 
@@ -1783,7 +1782,7 @@ export default function HomePage() {
       </div>
       <ToastContainer
         position="top-right"
-        autoClose={5000}
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick={false}
