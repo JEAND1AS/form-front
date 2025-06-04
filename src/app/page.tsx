@@ -1129,25 +1129,31 @@ export default function HomePage() {
   useEffect(() => {
     const ultimoTipo = localStorage.getItem('ultimoTipoPBE');
     const ultimaEscola = localStorage.getItem('ultimaEscola');
+    const escolaValida = escola === 'franco' ? 5 : 1;
+    const escolastring = String(escolaValida);
+  
 
-    if (tipoPBE && escola) {
+
+
+    if (tipoPBE && escolaValida) {
       const mudouTipo = ultimoTipo !== tipoPBE;
-      const mudouEscola = ultimaEscola !== escola;
+      const mudouEscola = ultimaEscola !== escolastring;
 
-      if (mudouTipo || mudouEscola) {
+
+       if (mudouTipo || mudouEscola) {
         setFormData({});
         setCurrentStep(0);
         localStorage.removeItem('formData');
 
         localStorage.setItem('ultimoTipoPBE', tipoPBE);
-        localStorage.setItem('ultimaEscola', escola);
+        localStorage.setItem('ultimaEscola', escolastring);
       } else {
         const dadosSalvos = localStorage.getItem('formData');
         if (dadosSalvos) {
           setFormData(JSON.parse(dadosSalvos));
         }
       }
-    }
+    } 
   }, [tipoPBE, escola]);
 
 
@@ -1157,25 +1163,16 @@ export default function HomePage() {
     const unidadeSelecionada = formData['Unidade:'];
 
 
-   
-
-    return !anoInteresse
-      ? []
-      : (escola !== 'franco' && !unidadeSelecionada)
-        ? []
-        :(
-            escola === 'franco'
-              ? filiais.filter(f => f.coligada === 5).flatMap(f => f.segmentos.flatMap(s => s.series))
-              : tipoPBE === 'bancocarioca'
-                ? filiais.find(f => f.code === 'MA')?.segmentos.flatMap(s => s.series) || []
-                : filiais.find(f => f.code === unidadeSelecionada)?.segmentos.flatMap(s => s.series) || []
-          )
-          .filter(s => (tipoPBE === 'bancocarioca' && anoInteresse === '2024') ? ['1S2', '2S2', '3S2'].includes(s.code) : true)
-          .map(s => 
-          (unidadeSelecionada || !unidadeSelecionada)
-              ? (anoInteresse === '2024' ? s.name : s.name.replace('2024', anoInteresse))
-              : s.name,
-          );
+    return !anoInteresse ||(escola !== 'franco' && !unidadeSelecionada) ? [] 
+  : ( 
+    (tipoPBE === 'bancocarioca' && anoInteresse === '2024'
+      ? filiais.find(f => f.code === 'MA')?.segmentos.find(s => s.code === 'EM')?.series
+      : (escola === 'franco'
+          ? filiais.filter(f => f.coligada === 5)
+          : filiais.filter(f => f.code === unidadeSelecionada)
+        ).flatMap(f => f.segmentos.flatMap(s => s.series))
+    ) || []
+  ).map(s => s.name.replace('2024', anoInteresse));
 
   }, [
     formData['Ano de interesse da matrícula:'],
@@ -1183,9 +1180,6 @@ export default function HomePage() {
     tipoPBE,
     escola
   ]);
-
-
-
 
   const selecionarAnoEscolar = useMemo(() => {
     if (escola === 'cel') {
@@ -1331,7 +1325,7 @@ export default function HomePage() {
     let valorFormatado = valor;
 
 
-    if (campo.includes('Data de nascimento:') && valor > new Date().toISOString().slice(0, 10)){
+    if (campo.includes('Data de nascimento:') && valor > new Date().toISOString().slice(0, 10)) {
       errors[campo] = 'Data de nascimento não pode ser futura';
       setErrors({ ...errors });
       return;
@@ -1350,7 +1344,7 @@ export default function HomePage() {
       valorFormatado = formatarCPF(valor)
     );
 
-    
+
 
 
 
@@ -1747,7 +1741,7 @@ export default function HomePage() {
                         onChange={(e) => handleChange(campo.nome, e.target.value)}
                         placeholder={campo.placeholder || ''}
                         {... (campo.tipoInput === 'date' ? { max: new Date().toISOString().slice(0, 10) } : {})}
-                        
+
                       />
                     )}
 
